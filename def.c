@@ -291,3 +291,5 @@ void DeleteTree(Node * root)
 		DeleteTree(root->Right);
 	free(root);
 }
+
+//проверка

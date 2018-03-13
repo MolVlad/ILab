@@ -66,24 +66,37 @@ typedef struct Node {
 	struct Node * Right;
 } Node;
 
+int global_change = 0;
+
 //DECLARATION OF FUNCTIONS
+
 //functions for differentiator
 Node * Diff(const Node * root);
 Node * Copy(const Node * root);
 Node * CreateNode(int type, int value, Node * left, Node * right); 
 
-//functions for save to file
+//functions for print to file
 void StrToFile(Data str);
 void SaveTree(Node * root);
 Data PrintToStr(Node * root);
+
+//functions for optimization
 void DeleteTree(Node * root);
-
-
+Node * Compute(Node * root);
 
 
 int main()
 {
 	printf("Hello, world!");
+
+	Node * right = CreateNode(NUMBER, 13, NULL, NULL);
+	Node * left = CreateNode(VARIABLE, 0, NULL, NULL);
+	Node * root = CreateNode(OPERATOR, PLUS, left, right);
+
+	Node * res = Diff(root);
+	SaveTree(res);
+
+	
 
 	return 0;
 }
@@ -91,6 +104,88 @@ int main()
 
 
 //IMPLEMENTATION OF FUNCTIONS
+
+void Optimization(Node * root)
+{
+	while (global_change)
+	{
+		global_change = 0;
+	
+		//делаем дамп что запустилась оптимизация
+
+		Compute(root);
+
+		
+
+		//делаем дамп что цикл оптимизации завершен
+	}
+}
+
+Node * Compute(Node * root)
+{
+	switch (root->Type)
+	{
+	case NUMBER:
+	{
+		return root;
+	}
+	case OPERATOR:
+	{
+	Node * left_res = Compute(root->Left);
+	Node * right_res = Compute(root->Right);
+
+	if ((left_res->Type == NUMBER) && (right_res->Type == NUMBER))		//IsNumbers(lest_res, right_res);
+	{
+		Node * ret;
+		global_change ++; 	
+
+		switch (root->Value)
+		{
+		case PLUS:
+		{
+			ret = _NUM(left_res->Value + right_res->Value);
+			break; 
+		}
+		case MINUS:
+		{
+			ret = _NUM(left_res->Value - right_res->Value);
+			break; 
+	
+		}
+		case DIVIDE:
+		{
+			assert(right_res->Value);
+	
+			ret = _NUM(left_res->Value / right_res->Value);
+			break;
+		}
+		case MULTIPLY:
+		{
+			ret = _NUM(left_res->Value * right_res->Value);
+			break;
+		}
+		}
+	}
+	
+	if ((root->Value == MULTIPLY) && ((left_res->Value == 0) || (right_res->Value == 0)))		//умножение на ноль
+		ret = _NUM(0);
+
+	free(left_res);		
+	free(right_res);
+	DeleteTree(root);
+
+	return ret;
+	}
+	case FUNCTION:
+	{
+
+	}
+	case VARIABLE:
+	{
+		return root;
+	}
+	}
+}
 
 Node * Diff(const Node * root)
 {
@@ -166,18 +261,18 @@ Node * CreateNode(int type, int value, Node * left, Node * right)
 void StrToFile(Data str)	 
 {
 	FILE *file;
-	file = fopen("base.txt", "w");
+	file = fopen("rex.tex", "w");
 	assert(file);
 
 	fprintf(file, "\\documentclass[a4paper,12pt]{article}\n");
 	fprintf(file, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools, }\n");
 	fprintf(file, "\\begin{document}\n");
 
-	fprintf(file, "\[");
+	fprintf(file, "$");
 
 	fprintf(file, "%s", str);
 
-	fprintf(file, "\]");
+	fprintf(file, "$\n");
 
 	fprintf(file, "\\end{document}");
 
@@ -266,7 +361,7 @@ Data PrintToStr(Node * root)
 			right_str = PrintToStr(root->Right);
 			strcat(str, "(");
 			strcat(str, left_str);
-			strcat(str, ")\div(");
+			strcat(str, ")\(");
 			strcat(str, right_str);
 			strcat(str, ")");
 
@@ -291,5 +386,3 @@ void DeleteTree(Node * root)
 		DeleteTree(root->Right);
 	free(root);
 }
-
-//проверка

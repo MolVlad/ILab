@@ -3,14 +3,14 @@
 #include <assert.h>
 #include <string.h>
 
+//DEFINES
+
 #define OPERATOR 0
 
 #define PLUS 1
 #define MINUS 2
 #define DIVIDE 3
 #define MULTIPLY 4
-
-
 
 #define FUNCTION 5
 
@@ -32,71 +32,94 @@
 #define DEGREE 21	// x^a
 #define INDICATIVE 22	// a^x
 
-
-
 #define NUMBER 23
 
 #define VARIABLE 24
 
-
-
 #define ZERO CreateNode(NUMBER, 0, NULL, NULL)
 #define ONE CreateNode(NUMBER, 1, NULL, NULL)
 #define _NUM(x) CreateNode(NUMBER, x, NULL, NULL)
-#define _PLUS(u, v) CreateNode(OPERATOR, PLUS, Diff(u), Diff(v))
-#define _MINUS(u, v) CreateNode(OPERATOR, MINUS, Diff(u), Diff(v))
+#define _PLUS(u, v) CreateNode(OPERATOR, PLUS, u, v)
+#define _MINUS(u, v) CreateNode(OPERATOR, MINUS, u, v)
 #define _SQUARE(x) CreateNode(FUNCTION, DEGREE, Copy(x), _NUM(2))	// x^2
 #define _MUL(u, v) CreateNode(OPERATOR, MULTIPLY, Copy(u), Copy(v))	// u * v
 #define _DIVIDE(u, v) CreateNode(OPERATOR, DIVIDE, Copy(u), Copy(v))	// u / v
-
-
-
+#define _VAR CreateNode(VARIABLE, 0, NULL, NULL)
 #define _SIN(x) CreateNode(FUNCTION, SIN, Copy(x), NULL);
 
 
-
-#define MaxSizeStr 1000
-
-
-typedef char * Data;
+//STRUCT
 typedef struct Node {
-	int Value;
+	double Value;
 	int Type; 
 	struct Node * Left;
 	struct Node * Right;
 } Node;
 
+
+//GLOBAL
 int global_change = 0;
+FILE *file;
+
 
 //DECLARATION OF FUNCTIONS
 
 //functions for differentiator
 Node * Diff(const Node * root);
 Node * Copy(const Node * root);
-Node * CreateNode(int type, int value, Node * left, Node * right); 
+Node * CreateNode(int type, double value, Node * left, Node * right); 
 
 //functions for print to file
-void StrToFile(Data str);
-void SaveTree(Node * root);
-Data PrintToStr(Node * root);
+void NodeToFile(const Node * root);
+void DeleteTree(Node * root);
 
 //functions for optimization
-void DeleteTree(Node * root);
 Node * Compute(Node * root);
+void Optimization(Node * root);
+
 
 
 int main()
 {
-	printf("Hello, world!");
+	file = fopen("res.tex", "w");
+	assert(file);
 
-	Node * right = CreateNode(NUMBER, 13, NULL, NULL);
-	Node * left = CreateNode(VARIABLE, 0, NULL, NULL);
-	Node * root = CreateNode(OPERATOR, PLUS, left, right);
+	fprintf(file, "\\documentclass[a4paper,12pt]{article}\n");
+	fprintf(file, "\\usepackage[T2A]{fontenc}\n");
+	fprintf(file, "\\usepackage[utf8]{inputenc}\n");
+	fprintf(file, "\\usepackage[english,russian]{babel}\n"); 
+	fprintf(file, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools, }\n");
+	fprintf(file, "\\usepackage[normalem]{ulem}\n");
+
+
+	fprintf(file, "\\begin{document}\n");
+	fprintf(file, "\\section*{\\sout{Капитан очевидность}}"); 
+	fprintf(file, "\\section*{Производные}");
+
+
+
+	Node * a = CreateNode(OPERATOR, PLUS, _NUM(1), _VAR);
+	Node * b = CreateNode(OPERATOR, MULTIPLY, _VAR, a);
+	Node * c = CreateNode(OPERATOR, PLUS, _VAR, _NUM(2));
+	Node * d = CreateNode(OPERATOR, MULTIPLY, _NUM(3), c);
+	Node * e = CreateNode(OPERATOR, MINUS, _NUM(1), _VAR);
+	Node * f = CreateNode(OPERATOR, DIVIDE, d, e);
+
+	Node * root = CreateNode(OPERATOR, MINUS, b, f);
 
 	Node * res = Diff(root);
-	SaveTree(res);
-
 	
+	global_change = 1;
+//	Optimization(res);
+//	NodeToFile(res);
+/*	
+	DeleteTree(res);
+
+	DeleteTree(root);
+*/
+	fprintf(file, "\\end{document}");
+
+	fclose(file);
 
 	return 0;
 }
@@ -113,16 +136,29 @@ void Optimization(Node * root)
 	
 		//делаем дамп что запустилась оптимизация
 
-		Compute(root);
+		root = Compute(root);
 
-		
+		assert(root);	
 
 		//делаем дамп что цикл оптимизации завершен
 	}
 }
 
+int IsNumbers(Node * left, Node * right)
+{
+	assert(left);
+	assert(right);
+
+	int l_type = (int)left->Type;
+	int r_type = (int)right->Type;
+
+	return ((l_type == NUMBER) && (r_type == NUMBER));
+}
+
 Node * Compute(Node * root)
 {
+	assert(root);
+
 	switch (root->Type)
 	{
 	case NUMBER:
@@ -131,54 +167,69 @@ Node * Compute(Node * root)
 	}
 	case OPERATOR:
 	{
-	Node * left_res = Compute(root->Left);
-	Node * right_res = Compute(root->Right);
+	assert(root->Left);
+	assert(root->Right);
 
-	if ((left_res->Type == NUMBER) && (right_res->Type == NUMBER))		//IsNumbers(lest_res, right_res);
+	root->Left = Compute(root->Left);
+	root->Right = Compute(root->Right);
+
+	assert(root->Left);
+	assert(root->Right);
+
+	Node * ret;
+
+	if (IsNumbers(root->Left, root->Right))
 	{
-		Node * ret;
 		global_change ++; 	
 
-		switch (root->Value)
+
+		fprintf(file, "\\begin{math}");
+
+		NodeToFile(root);
+
+		fprintf(file, " = ");	
+
+		int value = (int)root->Value;
+
+		switch (value)
 		{
 		case PLUS:
 		{
-			ret = _NUM(left_res->Value + right_res->Value);
+			ret = _NUM(root->Left->Value + root->Right->Value);
 			break; 
 		}
 		case MINUS:
 		{
-			ret = _NUM(left_res->Value - right_res->Value);
+			ret = _NUM(root->Left->Value - root->Right->Value);
 			break; 
 	
 		}
 		case DIVIDE:
 		{
-			assert(right_res->Value);
+			assert(root->Right->Value);
 	
-			ret = _NUM(left_res->Value / right_res->Value);
+			ret = _NUM(root->Left->Value / root->Right->Value);
 			break;
 		}
 		case MULTIPLY:
-		{
-			ret = _NUM(left_res->Value * right_res->Value);
+		{	
+			ret = _NUM(root->Left->Value * root->Right->Value);
 			break;
 		}
 		}
 	}
-	
-	if ((root->Value == MULTIPLY) && ((left_res->Value == 0) || (right_res->Value == 0)))		//умножение на ноль
-		ret = _NUM(0);
 
-	free(left_res);		
-	free(right_res);
-	DeleteTree(root);
+	NodeToFile(ret);
+
+	fprintf(file, "\\end{math} \n\\\\[0.5cm]\n");
+
+	assert(ret);
 
 	return ret;
 	}
 	case FUNCTION:
 	{
-
+	
 	}
 	case VARIABLE:
 	{
@@ -189,19 +240,38 @@ Node * Compute(Node * root)
 
 Node * Diff(const Node * root)
 {
+	assert(root);
+
+	Node * ret;
+
 	switch (root->Type)
 	{
 	case NUMBER:
-		return ZERO;
+	{
+		ret = ZERO;
+		break;
+	}
 	case VARIABLE:
-		return ONE;
+	{
+		ret = ONE;
+		break;
+	}
 	case OPERATOR:
-		switch (root->Value)
+	{
+		int value = (int)root->Value;
+
+		switch (value)
 		{
 		case PLUS:	// (u+v)' = u' + v'
-			return _PLUS(Diff(root->Left), Diff(root->Right));
+		{
+			ret = _PLUS(Diff(root->Left), Diff(root->Right));
+			break;
+		}
 		case MINUS:	// (u-v)' = u' - v'
-			return _MINUS(Diff(root->Left), Diff(root->Right));
+		{
+			ret = _MINUS(Diff(root->Left), Diff(root->Right));
+			break;
+		}
 		case MULTIPLY:	// (uv)' = u'v + uv'
 		{
 			Node * u1 = Diff(root->Left);	//u'
@@ -209,8 +279,9 @@ Node * Diff(const Node * root)
 			Node * u = Copy(root->Left);	//u
 			Node * v1 = Diff(root->Right);	//v'
 
-			return _PLUS(_MUL(u1, v), _MUL(u, v1));
-		}	
+			ret = _PLUS(_MUL(u1, v), _MUL(u, v1));
+			break;	
+		}
 		case DIVIDE:	// (u/v)' = (u'v - uv') / v^2
 		{
 			Node * u1 = Diff(root->Left);	//u'
@@ -220,17 +291,42 @@ Node * Diff(const Node * root)
 
 			Node * numerator = _MINUS(_MUL(u1, v), _MUL(u, v1));	//числитель
 			
-			Node * denominator = _SQUARE(v);	//знаменатель
+			Node * denominator = _MUL(v, v);	//знаменатель
 
-			return _DIVIDE(numerator, denominator);
-		}}
+			ret = _DIVIDE(numerator, denominator);
+			break;
+		}
+		}
+	}
 	case FUNCTION:
-		switch (root->Value)
+	{
+		int value = (int)root->Value;
+
+		switch (value)
 		{
 		
 		}
 	}
+	}
+
+	assert(ret);
+
+	fprintf(file, "\\begin{math}");
+
+	fprintf(file, "\\left(");
+
+	NodeToFile(root);
+
+	fprintf(file, "\\right)^\\prime = ");	
+
+	NodeToFile(ret);
+
+	fprintf(file, "\\end{math} \n\\\\[0.5cm]\n");
+
+	return ret;
 }
+
+
 Node * Copy(const Node * root)
 {
 	if (!root)
@@ -243,10 +339,12 @@ Node * Copy(const Node * root)
 	ret->Value = root->Value;
 	ret->Type = root->Type;	
 
+	assert(ret);
+
 	return ret;
 }
 
-Node * CreateNode(int type, int value, Node * left, Node * right) 
+Node * CreateNode(int type, double value, Node * left, Node * right) 
 {
 	Node * ret = (Node *) calloc(1, sizeof(Node));
 
@@ -255,126 +353,96 @@ Node * CreateNode(int type, int value, Node * left, Node * right)
 	ret->Left = left;
 	ret->Right = right;
 
+	assert(ret);
+
 	return ret;
 }
 
-void StrToFile(Data str)	 
-{
-	FILE *file;
-	file = fopen("rex.tex", "w");
-	assert(file);
-
-	fprintf(file, "\\documentclass[a4paper,12pt]{article}\n");
-	fprintf(file, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools, }\n");
-	fprintf(file, "\\begin{document}\n");
-
-	fprintf(file, "$");
-
-	fprintf(file, "%s", str);
-
-	fprintf(file, "$\n");
-
-	fprintf(file, "\\end{document}");
-
-	fclose(file);
-}
-
-void SaveTree(Node * root)
-{
-	Data str = PrintToStr(root);
-	assert(str);
-
-	StrToFile(str);
-
-	DeleteTree(root);
-
-	free(str);
-}
-
-Data PrintToStr(Node * root)
+void NodeToFile(const Node * root)
 {
 	assert(root);	
-
-	Data str = (Data) calloc(MaxSizeStr, sizeof(char));
-
-	Data left_str;
-	Data  right_str;
 
 	switch (root->Type)
 	{
 	case NUMBER:
 	{
-		sprintf(str, "%d", root->Value);
-		return str;
+		fprintf(file, "%.0f", root->Value);
+		break;
 	}
 	case VARIABLE:
 	{
-		sprintf(str, "x");
-		return str;
+		fprintf(file, "x");
+		break;
 	}	
 	case OPERATOR:
-		switch (root->Value)
+	{
+		assert(root->Left);
+		assert(root->Right);
+
+		int value = (int)root->Value;
+
+		switch (value)
 		{
 		case PLUS:
 		{
-			left_str = PrintToStr(root->Left);
-			right_str = PrintToStr(root->Right);
-		
-			strcat(str, left_str);
-			strcat(str, "+");
-			strcat(str, right_str);
+			NodeToFile(root->Left);
 
-			free(left_str);
-			free(right_str);
-			return str;
+			fprintf(file, "+");
+
+			NodeToFile(root->Right);	
+
+			break;
 		}
 		case MINUS:
 		{
-			left_str = PrintToStr(root->Left);
-			right_str = PrintToStr(root->Right);
-		
-			strcat(str, left_str);
-			strcat(str, "-");
-			strcat(str, right_str);
+			NodeToFile(root->Left);
 
-			free(left_str);
-			free(right_str);
-			return str;
+			fprintf(file, "-");
+
+			NodeToFile(root->Right);	
+		
+			break;
 		}	
 		case MULTIPLY:
 		{
-			left_str = PrintToStr(root->Left);
-			right_str = PrintToStr(root->Right);
-			strcat(str, "(");
-			strcat(str, left_str);
-			strcat(str, ")(");
-			strcat(str, right_str);
-			strcat(str, ")");
+	
+			fprintf(file, "(");
 
-			free(left_str);
-			free(right_str);
-			return str;		
+			NodeToFile(root->Left);
+
+			fprintf(file, ")\\cdot(");
+
+			NodeToFile(root->Right);	
+	
+			fprintf(file, ")");
+
+			break;		
 		}	
 		case DIVIDE:	
 		{
-			left_str = PrintToStr(root->Left);
-			right_str = PrintToStr(root->Right);
-			strcat(str, "(");
-			strcat(str, left_str);
-			strcat(str, ")\(");
-			strcat(str, right_str);
-			strcat(str, ")");
+			fprintf(file, "\\frac{");
+			
+			NodeToFile(root->Left);
 
-			free(left_str);
-			free(right_str);
-			return str;		
+			fprintf(file, "}{");
+
+			NodeToFile(root->Right);	
+	
+			fprintf(file, "}");	
+
+			break;		
 		}	
 		}
+	}
 	case FUNCTION:
-		switch (root->Value)
+	{
+		int value = (int)root->Value;
+
+		switch (value)
 		{
 		
 		}
+	}
 	}
 }
 

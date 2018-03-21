@@ -3,8 +3,6 @@
 #include <assert.h>
 #include <string.h>
 
-//DEFINES
-
 #define OPERATOR 0
 
 #define PLUS 1
@@ -14,52 +12,30 @@
 
 #define _PLUS(u, v) CreateNode(OPERATOR, PLUS, u, v)
 #define _MINUS(u, v) CreateNode(OPERATOR, MINUS, u, v)
-#define _MUL(u, v) CreateNode(OPERATOR, MULTIPLY, u, v)			//u * v
-#define _DIVIDE(u, v) CreateNode(OPERATOR, DIVIDE, u, v)		//u / v
+#define _MUL(u, v) CreateNode(OPERATOR, MULTIPLY, u, v)		//u * v
+#define _DIVIDE(u, v) CreateNode(OPERATOR, DIVIDE, u, v)	//u / v
 
+#define FUNCTION 5
 
+#define SIN 6
+#define COS 7
+#define TG 8
+#define ARCSIN 9
+#define ARCTG 10
+#define EXP 11		// e^x
+#define LOG 12		// log a (x)
+#define LN 13		// ln(x)
+#define DEGREE 14	//x^a or a^x
 
-#define FUNCTION 7
-
-#define SIN 8
-#define COS 9
-#define TG 10
-#define CTG 11
-#define ARCSIN 12
-#define ARCCOS 13
-#define ARCTG 14
-#define ARCCTG 15
-#define SH 16
-#define CH 17
-#define TH 18
-#define CTH 19
-#define EXP 20		// e^x
-#define LOG 21		// log a (x)
-#define LN 22		// ln(x)
-#define INDICATIVE 23	// a^x
-#define DEGREE 24	//x^a
-#define ROOT 25
-
-#define _DEGREE(a, x) CreateNode(FUNCTION, DEGREE, _NUM(a), x)		//x^a
-#define _ROOT(a, x) CreateNode(FUNCTION, ROOT, _NUM(a), x)		//root of degree a of x
+#define _DEGREE(x, y) CreateNode(FUNCTION, DEGREE, x, y)	//x^y
 #define _SIN(x) CreateNode(FUNCTION, SIN, NULL, x)
 #define _COS(x) CreateNode(FUNCTION, COS, NULL, x)
 #define _TG(x) CreateNode(FUNCTION, TG, NULL, x)
-#define _CTG(x) CreateNode(FUNCTION, CTG, NULL, x)
-#define _LN(x) CreateNode(FUNCTION, LN, NULL, x)			//ln (x)
-#define _LOG(a, x) CreateNode(FUNCTIONS, LOG, _NUM(a), x)		//log a (x)
-#define _INDICATIVE(x, a) CreateNode(FUNCTION, INDICATIVE, _NUM(a), x)	//a^x
+#define _LN(x) CreateNode(FUNCTION, LN, NULL, x)		//ln (x)
+#define _LOG(a, x) CreateNode(FUNCTIONS, LOG, _NUM(a), x)	//log a (x)
 #define _EXP(x) CreateNode(FUNCTION, EXP, NULL, x)
-#define _SH(x) CreateNode(FUNCTION, SH, NULL, x)
-#define _CH(x) CreateNode(FUNCTION, CH, NULL, x)
-#define _TH(x) CreateNode(FUNCTION, TH, NULL, x)
-#define _CTH(x) CreateNode(FUNCTION, CTH, NULL, x)
 #define _ARCSIN(x) CreateNode(FUNCTION, ARCSIN, NULL, x)
-#define _ARCCOS(x) CreateNode(FUNCTION, ARCCOS, NULL, x)
 #define _ARCTG(x) CreateNode(FUNCTION, ARCTG, NULL, x)
-#define _ARCCTG(x) CreateNode(FUNCTION, ARCCTG, NULL, x)
-
-
 
 #define NUMBER 24
 
@@ -67,119 +43,241 @@
 #define ONE CreateNode(NUMBER, 1, NULL, NULL)
 #define _NUM(x) CreateNode(NUMBER, x, NULL, NULL)
 
-
-
 #define VARIABLE 25
 
 #define _VAR CreateNode(VARIABLE, 0, NULL, NULL)
 
-
-
-//STRUCT
 typedef struct Node {
-	double Value;
-	int Type; 
+	int Value;
+	int Type;
 	struct Node * Left;
 	struct Node * Right;
 } Node;
 
-
-//GLOBAL
 int global_change = 1;
-FILE *file;
+FILE *file_dot, *file_latex;
+int dot_counter;
 
-
-//DECLARATION OF FUNCTIONS
-
-//functions for differentiator
 Node * Diff(const Node * root);
 Node * Copy(const Node * root);
-Node * CreateNode(int type, double value, Node * left, Node * right); 
+Node * CreateNode(int type, double value, Node * left, Node * right);
 
-//functions for print to file
-void NodeToFile(const Node * root);
+void BeginForLatex();
+void EndForLatex(Node * root);
+void NodeToLatex(const Node * root);
+
 void DeleteTree(Node * root);
 
-//functions for optimization
 Node * Compute(Node * root);
 void Optimization(Node * root);
 
-
+void PrintToDot(Node * root);
+void NodeToDot(Node * root);
 
 int main()
 {
-	file = fopen("res.tex", "w");
-	assert(file);
-
-	fprintf(file, "\\documentclass[a4paper,12pt]{article}\n");
-	fprintf(file, "\\usepackage[T2A]{fontenc}\n");
-	fprintf(file, "\\usepackage[utf8]{inputenc}\n");
-	fprintf(file, "\\usepackage[english,russian]{babel}\n"); 
-	fprintf(file, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools, }\n");
-	fprintf(file, "\\usepackage[normalem]{ulem}\n");
-
-
-	fprintf(file, "\\begin{document}\n");
-	fprintf(file, "\\section*{\\sout{Капитан очевидность}}"); 
-	fprintf(file, "\\section*{Производные}");
-
 	Node * a = _PLUS(_NUM(1), _VAR);
 	Node * b = _MUL(_VAR, a);
 	Node * c = _PLUS(_VAR, _NUM(2));
 	Node * d = _MUL(_NUM(3), c);
 	Node * e = _MINUS(_NUM(1), _VAR);
 	Node * f = _DIVIDE(d, e);
+	Node * root = _MINUS(b, f);
 
-	Node * root = CreateNode(OPERATOR, MINUS, b, f);
-
-	Node * sqrt = _ROOT(2, _VAR);
-	Node * sq = _DEGREE(3, _VAR);
-
-	Node * g = _PLUS(sq, sqrt);
-
-	root = _PLUS(g, root);
+//	BeginForLatex();
 
 	Node * res = Diff(root);
 
-#if defined(optimization)
-	Optimization(res);
-	NodeToFile(res);
-#endif
+//	Optimization(res);
 
-#if defined(delete)	
-	DeleteTree(res);
+//	EndForLatex(res);
 
-	DeleteTree(root);
-#endif
+//	PrintToDot(root);
 
-	fprintf(file, "\\end{document}");
+//	DeleteTree(res);
+	DeleteTree(_VAR);
 
-	fclose(file);
-
-	system("pdflatex res.tex");
-	system("rm res.log res.aux");
-
-#if defined(realise)
-	system("rm res.tex");
-#endif
 	return 0;
 }
 
+void BeginForLatex()
+{
+	file_latex = fopen("res.tex", "w");
+	assert(file_latex);
 
+	fprintf(file_latex, "\\documentclass[a4paper,12pt]{article}\n");
+	fprintf(file_latex, "\\usepackage[T2A]{fontenc}\n");
+	fprintf(file_latex, "\\usepackage[utf8]{inputenc}\n");
+	fprintf(file_latex, "\\usepackage[english,russian]{babel}\n");
+	fprintf(file_latex, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools, }\n");
+	fprintf(file_latex, "\\usepackage[normalem]{ulem}\n");
 
-//IMPLEMENTATION OF FUNCTIONS
+	fprintf(file_latex, "\\begin{document}\n");
+	fprintf(file_latex, "\\section*{\\sout{Капитан очевидность}}");
+	fprintf(file_latex, "\\section*{Производные}");
+}
 
+void EndForLatex(Node * root)
+{
+	fprintf(file_latex, "\\text{Окончательно получаем:}");
+	fprintf(file_latex, "\n\\\\[0.5cm]\n");
+	fprintf(file_latex, "$");
+	NodeToLatex(root);
+	fprintf(file_latex, "$");
+	fprintf(file_latex, "\n\\end{document}");
+
+	fclose(file_latex);
+
+	system("pdflatex res.tex");
+	system("rm res.log res.aux");
+	system("rm res.tex");
+}
+
+void PrintToDot(Node * root)
+{
+	file_dot = fopen("tree.dot", "w");
+	assert(file_dot);
+
+	fprintf(file_dot, "digraph G {\n");
+
+	dot_counter = 0;
+
+	NodeToDot(root);
+
+	fprintf(file_dot, "}");
+
+	fclose(file_dot);
+
+	system("dot -v -Tpng -o tree tree.dot");
+	system("rm tree.dot");
+}
+
+void NodeToDot(Node * root)
+{
+	assert(root);
+
+	int cur = dot_counter;
+
+	fprintf(file_dot, "\tN%d [label=\"", cur);
+	switch (root->Type)
+	{
+		case NUMBER:
+			{
+				fprintf(file_dot, "%d", root->Value);
+				break;
+			}
+		case OPERATOR:
+			{
+				switch (root->Value)
+				{
+					case PLUS:
+						{
+							fprintf(file_dot, "+");
+							break;
+						}
+					case MINUS:
+						{
+							fprintf(file_dot, "-");
+							break;
+						}
+					case DIVIDE:
+						{
+							fprintf(file_dot, "/");
+							break;
+						}
+					case MULTIPLY:
+						{
+							fprintf(file_dot, "*");
+							break;
+						}
+				}
+				break;
+			}
+		case VARIABLE:
+			{
+				fprintf(file_dot, "x");
+				break;
+			}
+		case FUNCTION:
+			{
+				switch (root->Value)
+				{
+					case SIN:
+						{
+							fprintf(file_dot, "sin");
+							break;
+						}
+					case COS:
+						{
+							fprintf(file_dot, "cos");
+							break;
+						}
+					case TG:
+						{
+							fprintf(file_dot, "tg");
+							break;
+						}
+					case ARCSIN:
+						{
+							fprintf(file_dot, "arcsin");
+							break;
+						}
+					case ARCTG:
+						{
+							fprintf(file_dot, "arccos");
+							break;
+						}
+					case EXP:
+						{
+							fprintf(file_dot, "exp");
+							break;
+						}
+					case LOG:
+						{
+							fprintf(file_dot, "log");
+							break;
+						}
+					case LN:
+						{
+							fprintf(file_dot, "ln");
+							break;
+						}
+					case DEGREE:
+						{
+							fprintf(file_dot, "^");
+							break;
+						}
+				}
+				break;
+			}
+	}
+	fprintf(file_dot, "\"]\n");
+
+	if (root->Left)
+	{
+		fprintf(file_dot, "\tN%d->N%d\n", cur, ++dot_counter);
+		NodeToDot(root->Left);
+	}
+
+	if (root->Right)
+	{
+		fprintf(file_dot, "\tN%d->N%d\n", cur, ++dot_counter);
+		NodeToDot(root->Right);
+	}
+}
+
+/*
 void Optimization(Node * root)
 {
 	while (global_change)
 	{
 		global_change = 0;
-	
+
 		root = Compute(root);
 
-		assert(root);	
+		assert(root);
 	}
-}
+}*/
 
 int IsNumbers(Node * left, Node * right)
 {
@@ -191,7 +289,7 @@ int IsNumbers(Node * left, Node * right)
 
 	return ((l_type == NUMBER) && (r_type == NUMBER));
 }
-
+/*
 Node * Compute(Node * root)
 {
 	printf("lol");
@@ -219,14 +317,14 @@ Node * Compute(Node * root)
 
 	if (IsNumbers(root->Left, root->Right))
 	{
-		global_change ++; 	
+		global_change ++;
 
 
-		fprintf(file, "$");
+		fprintf(file_latex, "$");
 
-		NodeToFile(root);
+		NodeToLatex(root);
 
-		fprintf(file, " = ");	
+		fprintf(file_latex, " = ");
 
 		int value = (int)root->Value;
 
@@ -235,32 +333,32 @@ Node * Compute(Node * root)
 		case PLUS:
 		{
 			ret = _NUM(root->Left->Value + root->Right->Value);
-			break; 
+			break;
 		}
 		case MINUS:
 		{
 			ret = _NUM(root->Left->Value - root->Right->Value);
-			break; 
-	
+			break;
+
 		}
 		case DIVIDE:
 		{
 			assert(root->Right->Value);
-	
+
 			ret = _NUM(root->Left->Value / root->Right->Value);
 			break;
 		}
 		case MULTIPLY:
-		{	
+		{
 			ret = _NUM(root->Left->Value * root->Right->Value);
 			break;
 		}
 		}
 	}
 
-	NodeToFile(ret);
+	NodeToLatex(ret);
 
-	fprintf(file, "$\n\\\\[0.5cm]\n");
+	fprintf(file_latex, "$\n\\\\[0.5cm]\n");
 
 	assert(ret);
 
@@ -268,14 +366,14 @@ Node * Compute(Node * root)
 	}
 	case FUNCTION:
 	{
-	
+
 	}
 	case VARIABLE:
 	{
 		return root;
 	}
 	}
-}
+}*/
 
 Node * Diff(const Node * root)
 {
@@ -297,9 +395,7 @@ Node * Diff(const Node * root)
 		}
 		case OPERATOR:
 		{
-			int value = (int)root->Value;
-
-			switch (value)
+			switch (root->Value)
 			{
 				case PLUS:	// (u+v)' = u' + v'
 				{
@@ -319,7 +415,7 @@ Node * Diff(const Node * root)
 					Node * v1 = Diff(root->Right);	//v'
 
 					ret = _PLUS(_MUL(u1, v), _MUL(u, v1));
-					break;	
+					break;
 				}
 				case DIVIDE:	// (u/v)' = (u'v - uv') / v^2
 				{
@@ -339,63 +435,65 @@ Node * Diff(const Node * root)
 		}
 		case FUNCTION:	// (f(x))' =  f' * x'
 		{
-			int value = (int)root->Value;
-
-			switch (value)
+			switch (root->Value)
 			{
-				case DEGREE:	// (x ^ a)' = a * x ^ (a - 1)
+				case DEGREE:	// y = f(x) ^ g(x); ln(y) = g(x) * ln(f(x)); y' = y * (g * ln(f))'
 				{
-					int a = root->Left->Value;
-					Node * x = root->Right;
+					Node * y = Copy(root);
 
-					Node * base = _DEGREE(_NUM(a - 1), Copy(x));	// base = x ^ (a - 1)
+					Node * g = root->Right;
+					Node * f = root->Left;
 
-					Node * f1 = _MUL(_NUM(a), base);	// f' = a * base
+					Node * first_term = _MUL(Diff(g), _LN(Copy(f)));		// g' * ln(f)
+					Node * second_term = _MUL(Copy(g), _DIVIDE(Diff(f), Copy(f)));	// g * f' / f
 
-					ret = _MUL(f1, Diff(x));	// (f(x))' = f' * x'
-					break;
-				}
-				case ROOT:	// (root of degree a of x)' = (root of degree a of x) ^ (1 - a) \ a
-				{
-					int a = root->Left->Value;
-					Node * x = root->Right;
+					Node * sum = _PLUS(first_term, second_term);
 
-					Node * base = _DEGREE(_NUM(1 - a), Copy(x));	// base = x ^ (1 - a)
-
-					base = _ROOT(_NUM(a), base);	// base = (root of degree a of x) ^ (1 - a) 
-
-					Node * f1 = _DIVIDE(base, _NUM(a));	// f' = base \ a
-
-					ret = _MUL(f1, Diff(x));	// (f(x))' = f' * x'
-					break;
+					ret = _MUL(y, sum);
 				}
 				case SIN:
+					{
+
+					}
 				case COS:
+					{
+
+					}
 				case TG:
-				case CTG:
+					{
+
+					}
 				case LN:
+					{
+
+					}
 				case LOG:
+					{
+
+					}
 				case ARCSIN:
-				case ARCCOS:
+					{
+
+					}
 				case ARCTG:
-				case ARCCTG:
-				case SH:
-				case CH:
-				case TH:
-				case CTH:
+					{
+
+					}
 				case EXP:
-				case INDICATIVE:
+					{
+
+					}
 			}
 		}
 	}
 
 	assert(ret);
 
-	fprintf(file, "$\\left(");
-	NodeToFile(root);
-	fprintf(file, "\\right)^\\prime = ");	
-	NodeToFile(ret);
-	fprintf(file, "$\n\\\\[0.5cm]\n");
+	fprintf(file_latex, "$\\left(");
+	NodeToLatex(root);
+	fprintf(file_latex, "\\right)^\\prime = ");
+	NodeToLatex(ret);
+	fprintf(file_latex, "$\n\\\\[0.5cm]\n");
 
 	return ret;
 }
@@ -411,14 +509,14 @@ Node * Copy(const Node * root)
 	ret->Left = Copy(root->Left);
 	ret->Right = Copy(root->Right);
 	ret->Value = root->Value;
-	ret->Type = root->Type;	
+	ret->Type = root->Type;
 
 	assert(ret);
 
 	return ret;
 }
 
-Node * CreateNode(int type, double value, Node * left, Node * right) 
+Node * CreateNode(int type, double value, Node * left, Node * right)
 {
 	Node * ret = (Node *) calloc(1, sizeof(Node));
 
@@ -432,89 +530,182 @@ Node * CreateNode(int type, double value, Node * left, Node * right)
 	return ret;
 }
 
-void NodeToFile(const Node * root)
+void NodeToLatex(const Node * root)
 {
-	assert(root);	
+	assert(root);
 
 	switch (root->Type)
 	{
 		case NUMBER:
 		{
-			fprintf(file, "%.0f", root->Value);
+			fprintf(file_latex, "%d", root->Value);
 			break;
 		}
 		case VARIABLE:
 		{
-			fprintf(file, "x");
+			fprintf(file_latex, "x");
 			break;
-		}	
+		}
 		case OPERATOR:
 		{
 			assert(root->Left);
 			assert(root->Right);
 
-			int value = (int)(root->Value);
-
-			switch (value)
+			switch (root->Value)
 			{
 				case PLUS:
 				{
-					NodeToFile(root->Left);
+					NodeToLatex(root->Left);
 
-					fprintf(file, "+");
+					fprintf(file_latex, "+");
 
-					NodeToFile(root->Right);	
+					NodeToLatex(root->Right);
 
 					break;
 				}
 				case MINUS:
 				{
-					NodeToFile(root->Left);
+					NodeToLatex(root->Left);
 
-					fprintf(file, "-");
+					fprintf(file_latex, "-");
 
-					NodeToFile(root->Right);	
+					NodeToLatex(root->Right);
 
 					break;
-				}	
+				}
 				case MULTIPLY:
 				{
-	
-					fprintf(file, "(");
 
-					NodeToFile(root->Left);
+					fprintf(file_latex, "(");
 
-					fprintf(file, ")\\cdot(");
+					NodeToLatex(root->Left);
 
-					NodeToFile(root->Right);	
-	
-					fprintf(file, ")");
+					fprintf(file_latex, ")\\cdot(");
 
-					break;		
-				}	
-				case DIVIDE:	
+					NodeToLatex(root->Right);
+
+					fprintf(file_latex, ")");
+
+					break;
+				}
+				case DIVIDE:
 				{
-					fprintf(file, "\\frac{");
-			
-					NodeToFile(root->Left);
+					fprintf(file_latex, "\\frac{");
 
-					fprintf(file, "}{");
+					NodeToLatex(root->Left);
 
-					NodeToFile(root->Right);	
-	
-					fprintf(file, "}");	
+					fprintf(file_latex, "}{");
 
-					break;		
-				}	
+					NodeToLatex(root->Right);
+
+					fprintf(file_latex, "}");
+
+					break;
+				}
 			}
 		}
 		case FUNCTION:
 		{
-			int value = (int)root->Value;
-
-			switch (value)
+			switch (root->Value)
 			{
-		
+				case DEGREE:
+					{
+						fprintf(file_latex, "(");
+
+						NodeToLatex(root->Left);
+
+						fprintf(file_latex, ")^{");
+
+						NodeToLatex(root->Right);
+
+						fprintf(file_latex, "}");
+
+						break;
+					}
+				case SIN:
+					{
+						fprintf(file_latex, "\\sin(");
+
+						NodeToLatex(root->Right);
+
+						fprintf(file_latex, ")");
+
+						break;
+					}
+				case COS:
+					{
+						fprintf(file_latex, "\\cos(");
+
+						NodeToLatex(root->Right);
+
+						fprintf(file_latex, ")");
+
+						break;
+					}
+				case TG:
+					{
+						fprintf(file_latex, "\\sin(");
+
+						NodeToLatex(root->Right);
+
+						fprintf(file_latex, ")");
+
+						break;
+					}
+				case ARCSIN:
+					{
+						fprintf(file_latex, "\\arcsin(");
+
+						NodeToLatex(root->Right);
+
+						fprintf(file_latex, ")");
+
+						break;
+					}
+				case ARCTG:
+					{
+						fprintf(file_latex, "\\arctan(");
+
+						NodeToLatex(root->Right);
+
+						fprintf(file_latex, ")");
+
+						break;
+					}
+				case EXP:
+					{
+						fprintf(file_latex, "\\exp(");
+
+						NodeToLatex(root->Right);
+
+						fprintf(file_latex, ")");
+
+						break;
+					}
+				case LOG:
+					{
+						fprintf(file_latex, "\\log_{");
+
+						NodeToLatex(root->Left);
+
+						fprintf(file_latex, "\\}()");
+
+						NodeToLatex(root->Right);
+
+						fprintf(file_latex, ")");
+
+						break;
+					}
+				case LN:
+					{
+						fprintf(file_latex, "\\ln(");
+
+						NodeToLatex(root->Right);
+
+						fprintf(file_latex, ")");
+
+						break;
+					}
 			}
 		}
 	}
@@ -522,9 +713,12 @@ void NodeToFile(const Node * root)
 
 void DeleteTree(Node * root)
 {
+	assert(root);
+
 	if (root->Left)
-		DeleteTree(root->Right);
-	if (root->Left)
+		DeleteTree(root->Left);
+	if (root->Right)
 		DeleteTree(root->Right);
 	free(root);
+	root = NULL;
 }

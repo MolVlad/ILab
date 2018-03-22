@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <time.h>
 
 #define OPERATOR 0
 
@@ -58,6 +59,7 @@ int global_change = 1;
 FILE *file_dot, *file_latex;
 int dot_counter;
 
+char ** CapCreate();
 Node * Diff(const Node * root);
 Node * Copy(const Node * root);
 Node * CreateNode(int type, double value, Node * left, Node * right);
@@ -80,6 +82,8 @@ void NodeToDot(Node * root);
 
 int main()
 {
+	srand(time(NULL));
+
 	Node * root = CreateTree();
 
 	BeginForLatex();
@@ -96,6 +100,35 @@ int main()
 	DeleteTree(root);
 
 	return 0;
+}
+
+char ** CapCreate()
+{
+	char ** a = calloc(20, sizeof(char *));
+	int i;
+
+	a[0] = "Очевидно, что\n";
+	a[1] = "Заметим, что\n";
+	a[2] = "Легко видеть, что\n";
+	a[3] = "Нельзя не упомянуть тот факт, что\n";
+	a[4] = "Далее следует\n";
+	a[5] = "Как можно видеть\n";
+	a[6] = "С помощью нехитрых преобразований получаем, что\n";
+	a[7] = "Нетрудно догадаться, что\n";
+	a[8] = "С помощью несложных логических размышлений получаем, что\n";
+	a[9] = "При аналогичных размышлениях, получаем, что\n";
+	a[10] = "По всем известной формуле получаем, что\n";
+	a[11] = "Учитывая, что\n";
+	a[12] = "Отсюда несложно получить, что\n";
+	a[13] = "В частности:\n";
+	a[14] = "Обнаружив следующую закономерность:\n";
+	a[15] = "Следовательно,\n";
+	a[16] = "Откуда получаем, что\n";
+	a[17] = "И поэтому\n";
+	a[18] = "Таким образом,\n";
+	a[19] = "Не нужно быть гением, чтобы понять, что\n";
+
+	return a;
 }
 
 Node * CreateTree()
@@ -125,7 +158,7 @@ void BeginForLatex()
 
 	fprintf(file_latex, "\\begin{document}\n");
 	fprintf(file_latex, "\\section*{\\sout{Капитан очевидность}}");
-	fprintf(file_latex, "\\section*{Производные}");
+	fprintf(file_latex, "\\section*{Производные}\n");
 }
 
 void EndForLatex(Node * root)
@@ -302,7 +335,7 @@ int IsNumbers(Node * left, Node * right)
 
 Node * EasyMultiply(Node *root)
 {
-	
+
 }
 
 Node * EasyAddition(Node * root)
@@ -312,7 +345,7 @@ Node * EasyAddition(Node * root)
 
 Node *  EasyDivide(Node * root)
 {
-	
+
 }
 
 Node * Compute(Node * root)
@@ -341,6 +374,11 @@ Node * Compute(Node * root)
 					Node * ret;
 
 					global_change ++;
+
+					int i = rand() % 20;
+					char ** phrases = CapCreate();
+					fprintf(file_latex, "%s\\\\[0.5cm]\n", phrases[i]);
+					free(phrases);
 
 					fprintf(file_latex, "$");
 
@@ -513,6 +551,11 @@ Node * Diff(const Node * root)
 	}
 
 	assert(ret);
+
+	int i = rand() % 20;
+	char ** phrases = CapCreate();
+	fprintf(file_latex, "%s\\\\[0.5cm]\n", phrases[i]);
+	free(phrases);
 
 	fprintf(file_latex, "$\\left(");
 	NodeToLatex(root);

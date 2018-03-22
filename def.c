@@ -66,8 +66,12 @@ void BeginForLatex();
 void EndForLatex(Node * root);
 void NodeToLatex(const Node * root);
 
+Node * CreateTree();
 void DeleteTree(Node * root);
 
+Node * EasyMultiply(Node *root);
+Node * EasyAddition(Node * root);
+Node *  EasyDivide(Node * root);
 Node * Compute(Node * root);
 void Optimization(Node * root);
 
@@ -75,6 +79,26 @@ void PrintToDot(Node * root);
 void NodeToDot(Node * root);
 
 int main()
+{
+	Node * root = CreateTree();
+
+	BeginForLatex();
+
+	Node * res = Diff(root);
+
+	Optimization(res);
+
+	EndForLatex(res);
+
+	PrintToDot(root);
+
+	DeleteTree(res);
+	DeleteTree(root);
+
+	return 0;
+}
+
+Node * CreateTree()
 {
 	Node * a = _PLUS(_NUM(1), _VAR);
 	Node * b = _MUL(_VAR, a);
@@ -84,20 +108,7 @@ int main()
 	Node * f = _DIVIDE(d, e);
 	Node * root = _MINUS(b, f);
 
-//	BeginForLatex();
-
-	Node * res = Diff(root);
-
-//	Optimization(res);
-
-//	EndForLatex(res);
-
-//	PrintToDot(root);
-
-//	DeleteTree(res);
-	DeleteTree(_VAR);
-
-	return 0;
+	return root;
 }
 
 void BeginForLatex()
@@ -266,7 +277,6 @@ void NodeToDot(Node * root)
 	}
 }
 
-/*
 void Optimization(Node * root)
 {
 	while (global_change)
@@ -274,106 +284,121 @@ void Optimization(Node * root)
 		global_change = 0;
 
 		root = Compute(root);
+		root = EasyMultiply(root);
+		root = EasyAddition(root);
+		root = EasyDivide(root);
 
 		assert(root);
 	}
-}*/
+}
 
 int IsNumbers(Node * left, Node * right)
 {
 	assert(left);
 	assert(right);
 
-	int l_type = (int)(left->Type);
-	int r_type = (int)(right->Type);
-
-	return ((l_type == NUMBER) && (r_type == NUMBER));
+	return (((left->Type) == NUMBER) && (right->Type) == NUMBER);
 }
-/*
+
+Node * EasyMultiply(Node *root)
+{
+	
+}
+
+Node * EasyAddition(Node * root)
+{
+
+}
+
+Node *  EasyDivide(Node * root)
+{
+	
+}
+
 Node * Compute(Node * root)
 {
-	printf("lol");
-
 	assert(root);
 
 	switch (root->Type)
 	{
-	case NUMBER:
-	{
-		return root;
+		case NUMBER:
+			{
+				return root;
+			}
+		case OPERATOR:
+			{
+				assert(root->Left);
+				assert(root->Right);
+
+				root->Left = Compute(root->Left);
+				root->Right = Compute(root->Right);
+
+				assert(root->Left);
+				assert(root->Right);
+
+				if (IsNumbers(root->Left, root->Right))
+				{
+					Node * ret;
+
+					global_change ++;
+
+					fprintf(file_latex, "$");
+
+					NodeToLatex(root);
+
+					fprintf(file_latex, " = ");
+
+					switch (root->Value)
+					{
+						case PLUS:
+							{
+								ret = _NUM(root->Left->Value + root->Right->Value);
+								break;
+							}
+						case MINUS:
+							{
+								ret = _NUM(root->Left->Value - root->Right->Value);
+								break;
+							}
+						case DIVIDE:
+							{
+								assert(root->Right->Value);
+
+								ret = _NUM(root->Left->Value / root->Right->Value);
+								break;
+							}
+						case MULTIPLY:
+							{
+								ret = _NUM(root->Left->Value * root->Right->Value);
+								break;
+							}
+					}
+
+					DeleteTree(root);
+
+					NodeToLatex(ret);
+
+					fprintf(file_latex, "$\n\\\\[0.5cm]\n");
+
+					assert(ret);
+
+					return ret;
+				}
+				else
+				{
+					return root;
+				}
+			}
+		case FUNCTION:
+			{
+				return root;
+			}
+		case VARIABLE:
+			{
+				return root;
+			}
 	}
-	case OPERATOR:
-	{
-	assert(root->Left);
-	assert(root->Right);
-
-	root->Left = Compute(root->Left);
-	root->Right = Compute(root->Right);
-
-	assert(root->Left);
-	assert(root->Right);
-
-	Node * ret;
-
-	if (IsNumbers(root->Left, root->Right))
-	{
-		global_change ++;
-
-
-		fprintf(file_latex, "$");
-
-		NodeToLatex(root);
-
-		fprintf(file_latex, " = ");
-
-		int value = (int)root->Value;
-
-		switch (value)
-		{
-		case PLUS:
-		{
-			ret = _NUM(root->Left->Value + root->Right->Value);
-			break;
-		}
-		case MINUS:
-		{
-			ret = _NUM(root->Left->Value - root->Right->Value);
-			break;
-
-		}
-		case DIVIDE:
-		{
-			assert(root->Right->Value);
-
-			ret = _NUM(root->Left->Value / root->Right->Value);
-			break;
-		}
-		case MULTIPLY:
-		{
-			ret = _NUM(root->Left->Value * root->Right->Value);
-			break;
-		}
-		}
-	}
-
-	NodeToLatex(ret);
-
-	fprintf(file_latex, "$\n\\\\[0.5cm]\n");
-
-	assert(ret);
-
-	return ret;
-	}
-	case FUNCTION:
-	{
-
-	}
-	case VARIABLE:
-	{
-		return root;
-	}
-	}
-}*/
+}
 
 Node * Diff(const Node * root)
 {

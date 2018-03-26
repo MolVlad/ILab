@@ -133,11 +133,11 @@ Node * CreateTree(int n)
 			}
 		case 2:
 			{
-//				Node * exp = _EXP(_PLUS(_MUL(_NUM(2), _VAR), _NUM(2)));
+				Node * exp = _EXP(_PLUS(_MUL(_NUM(2), _VAR), _NUM(2)));
 				Node * g = _MUL(_NUM(3), _DEGREE(_VAR, _NUM(2)));
 				Node * h = _MUL(_NUM(9), _DEGREE(_VAR, _NUM(3)));
 				Node * arcsin = _ARCSIN(_DIVIDE(g, h));
-//				Node * two = _PLUS(exp, arcsin);
+				Node * two = _PLUS(exp, arcsin);
 				return arcsin;
 			}
 		case 3:
@@ -218,7 +218,7 @@ void EndForLatex(Node * root, Node * res)
 
 	system("pdflatex res.tex");
 	system("rm res.log res.aux");
-//	system("rm res.tex");
+	system("rm res.tex");
 }
 
 void PrintToDot(Node * root)

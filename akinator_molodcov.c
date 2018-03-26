@@ -333,6 +333,8 @@ int GetChildStr(data str, data l_str, data r_str)
     }
     r_str[i] = '\0';
 
+    assert(i == strlen(str));
+
     return 0;
 }
 
@@ -457,7 +459,7 @@ int FileIsOk(FILE * file)
     fseek(file, 0, SEEK_END);
 
     int position = ftell(file);
-    fseek(file, position - 1, SEEK_SET);
+    fseek(file, position - 2, SEEK_SET);
 
     char symbol;
     int all_is_ok;

@@ -53,10 +53,15 @@ void NodeToLatex(const Node * root);
 
 Node * CreateTree(int n);
 void DeleteTree(Node * root);
+Node * ScanTree();
+char * FileToStr();
+Node * StrToTree();
+int FileIsOk(FILE * file);
+int SizeOfFile(FILE * file);
 
 Node * EasyMultiply(Node *root);
 Node * EasyAddition(Node * root);
-Node *  EasyDivide(Node * root);
+Node * EasyDivide(Node * root);
 Node * Compute(Node * root);
 void Optimization(Node * root);
 int IsZero(Node * root);
@@ -70,19 +75,22 @@ int main()
 {
 	srand(time(NULL));
 
-	int n;
-	printf("print number 1-7\n");
-	scanf("%d", &n);
-	Node * root = CreateTree(n);
-	BeginForLatex(root);
-	Node * res = Diff(root);
-	global_change = 1;
-	Optimization(res);
-	EndForLatex(root, res);
+//	int n;
+//	printf("print number 1-7\n");
+//	scanf("%d", &n);
+//	Node * root = CreateTree(n);
+	Node * root = ScanTree();
+
+
+//	BeginForLatex(root);
+//	Node * res = Diff(root);
+//	global_change = 1;
+//	Optimization(res);
+//	EndForLatex(root, res);
 	PrintToDot(root);
 
-	DeleteTree(res);
-	DeleteTree(root);
+//	DeleteTree(res);
+//	DeleteTree(root);
 
 	return 0;
 }
@@ -114,6 +122,57 @@ char ** CapCreate()
 	a[19] = "Не нужно быть гением, чтобы понять, что\n";
 
 	return a;
+}
+
+Node * ScanTree()
+{
+	char * str = FileToStr();
+	Node * root = StrToTree(root);
+
+	assert(root);
+	return root;
+}
+
+Node * StrToTree()
+{
+	Node * ret = (Node *) calloc(1, sizeof(Node));
+
+
+	return ret;
+}
+
+char * FileToStr()
+{
+	FILE * file;
+	file = fopen("base.txt", "r");
+	assert(file);
+	assert(FileIsOk(file));
+
+	int n = SizeOfFile(file);
+	char * str = (char *) calloc(n, sizeof(char));
+	fscanf(file, "%[^~]", str);
+	fclose(file);
+
+	return str;
+}
+
+int FileIsOk(FILE * file)
+{
+	fseek(file, -2, SEEK_END);
+	char symbol;
+	fscanf(file, "%c", &symbol);
+	fseek(file, 0, SEEK_SET);
+
+	return symbol == '~';
+}
+
+int SizeOfFile(FILE * file)
+{
+	fseek(file, -2, SEEK_END);
+	int n = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	return n;
 }
 
 Node * CreateTree(int n)
@@ -527,7 +586,7 @@ Node * EasyAddition(Node * root)
 	return root;
 }
 
-Node *  EasyDivide(Node * root)
+Node * EasyDivide(Node * root)
 {
 	assert(root);
 
@@ -730,7 +789,7 @@ Node * Diff(const Node * root)
 
 				break;
 			}
-		case FUNCTION:	// (f(x))' =  f' * x'
+		case FUNCTION:	// (f(x))' = f' * x'
 			{
 				switch (root->Value)
 				{

@@ -41,6 +41,8 @@ typedef struct Node
 int global_change;
 FILE * file_dot, * file_latex;
 int dot_counter;
+char * str;
+int position;
 
 char ** CapCreate();
 Node * Diff(const Node * root);
@@ -55,9 +57,14 @@ Node * CreateTree(int n);
 void DeleteTree(Node * root);
 Node * ScanTree();
 char * FileToStr();
-Node * StrToTree();
 int FileIsOk(FILE * file);
 int SizeOfFile(FILE * file);
+
+Node * General(const char * formula);
+Node * Get_E();
+Node * Get_T();
+Node * Get_P();
+Node * Get_N();
 
 Node * EasyMultiply(Node *root);
 Node * EasyAddition(Node * root);
@@ -75,22 +82,18 @@ int main()
 {
 	srand(time(NULL));
 
-//	int n;
-//	printf("print number 1-7\n");
-//	scanf("%d", &n);
-//	Node * root = CreateTree(n);
 	Node * root = ScanTree();
 
-
-//	BeginForLatex(root);
-//	Node * res = Diff(root);
-//	global_change = 1;
-//	Optimization(res);
-//	EndForLatex(root, res);
+	BeginForLatex(root);
+	Node * res = Diff(root);
+	global_change = 1;
+	Optimization(res);
+	EndForLatex(root, res);
 	PrintToDot(root);
 
-//	DeleteTree(res);
-//	DeleteTree(root);
+	DeleteTree(res);
+	DeleteTree(root);
+	free(str);
 
 	return 0;
 }
@@ -127,18 +130,12 @@ char ** CapCreate()
 Node * ScanTree()
 {
 	char * str = FileToStr();
-	Node * root = StrToTree(root);
+	Node * root = General(str);
+	free(str);
 
 	assert(root);
+
 	return root;
-}
-
-Node * StrToTree()
-{
-	Node * ret = (Node *) calloc(1, sizeof(Node));
-
-
-	return ret;
 }
 
 char * FileToStr()
@@ -149,7 +146,7 @@ char * FileToStr()
 	assert(FileIsOk(file));
 
 	int n = SizeOfFile(file);
-	char * str = (char *) calloc(n, sizeof(char));
+	char * str = (char *) calloc(n+1, sizeof(char));
 	fscanf(file, "%[^~]", str);
 	fclose(file);
 
@@ -175,70 +172,211 @@ int SizeOfFile(FILE * file)
 	return n;
 }
 
-Node * CreateTree(int n)
+Node * General(const char * formula)
 {
-	switch (n)
+	int n = strlen(formula);
+	str = calloc(n+1, sizeof(char));
+	strcpy(str, formula);
+	position = 0;
+
+	Node * ret = Get_E();
+
+	assert(str[position] == '\0');
+
+	return ret;
+}
+
+Node * Get_E()
+{
+	printf("beginE\n");
+	Node * ret = Get_T();
+
+	while (str[position] == '+' || str[position] == '-')
 	{
-		case 1:
-			{
-				Node * a = _PLUS(_NUM(1), _VAR);
-				Node * b = _MUL(_VAR, a);
-				Node * c = _PLUS(_VAR, _NUM(2));
-				Node * d = _MUL(_NUM(3), c);
-				Node * e = _MINUS(_NUM(1), _VAR);
-				Node * f = _DIVIDE(d, e);
-				Node * one = _MINUS(b, f);
-				return one;
-			}
-		case 2:
-			{
-				Node * exp = _EXP(_PLUS(_MUL(_NUM(2), _VAR), _NUM(2)));
-				Node * g = _MUL(_NUM(3), _DEGREE(_VAR, _NUM(2)));
-				Node * h = _MUL(_NUM(9), _DEGREE(_VAR, _NUM(3)));
-				Node * arcsin = _ARCSIN(_DIVIDE(g, h));
-				Node * two = _PLUS(exp, arcsin);
-				return arcsin;
-			}
-		case 3:
-			{
-				Node * k = _MUL(_NUM(13), _DEGREE(_VAR, _NUM(7)));
-				Node * three = _DEGREE(_MUL(_NUM(5), _VAR), k);
-				return three;
-			}
-		case 4:
-			{
-				Node * ln = _DIVIDE(_NUM(1), _LN(_MINUS(_MUL(_NUM(3), _VAR), _NUM(9))));
-				Node * log = _LOG(_NUM(3), _DEGREE(_PLUS(_MUL(_NUM(2), _VAR), _NUM(5)), _DIVIDE(_NUM(1), _NUM(3))));
-				Node * four = _MINUS(ln, log);
-				return four;
-			}
-		case 5:
-			{
-				Node * n = _DIVIDE(_PLUS(_MUL(_NUM(2), _VAR), _NUM(1)), _MUL(_NUM(5), _DEGREE(_VAR, _NUM(2))));
-				Node * p = _SIN(_VAR);
-				Node * degr = _DEGREE(_MINUS(n, p), _DIVIDE(_NUM(5), _NUM(7)));
-				Node * r = _DEGREE(_COS(_MUL(_NUM(2), _VAR)), _NUM(2));
-				Node * s = _MUL(_NUM(9), _SIN(_MUL(_NUM(3), _VAR)));
-				Node * z = _ARCTG(_DIVIDE(_MUL(_NUM(5), _VAR), _MINUS(_NUM(1), _VAR)));
-				Node * five = _DIVIDE(_MINUS(r, s), z);
-				return five;
-			}
-		case 6:
-			{
-				Node * l = _MUL(_NUM(9), _DEGREE(_TG(_VAR), _NUM(2)));
-				Node * m = _DEGREE(_MINUS(_NUM(15), _VAR), _NUM(2));
-				Node * six = _DIVIDE(l, m);
-				return six;
-			}
-		case 7:
-			{
-				Node * sin = _SIN(_PLUS(_MUL(_CONST('a'), _VAR), _CONST('b')));
-				Node * j = _DEGREE(_CONST('a'), _VAR);
-				Node * y = _MINUS(_MUL(_CONST('a'), _DEGREE(_VAR, _NUM(2))), _CONST('b'));
-				Node * seven = _PLUS(_MINUS(sin, j), y);
-				return seven;
-			}
+		int operator = str[position];
+		position++;
+
+		Node * next_ret = Get_T();
+		printf("нашел %c\n", operator);
+		if (operator == '+')
+			ret = _PLUS(ret, next_ret);
+		else
+			ret = _MINUS(ret, next_ret);
 	}
+
+	printf("endE\n");
+	return ret;
+}
+
+Node * Get_T()
+{
+	printf("beginT\n");
+	Node * ret = Get_P();
+
+	while (str[position] == '*' || str[position] == '/' || str[position] == '^')
+	{
+		int operator = str[position];
+		position++;
+
+		Node * next_ret = Get_P();
+
+		printf("нашел %c\n", operator);
+		if (operator == '*')
+			ret = _MUL(ret, next_ret);
+		else if (operator == '/')
+			ret = _DIVIDE(ret, next_ret);
+		else if (operator == '^')
+			ret = _DEGREE(ret, next_ret);
+	}
+
+	printf("endT\n");
+	return ret;
+}
+
+Node * Get_P()
+{
+	Node * ret;
+	printf("beginP\n");
+	if (str[position] == '(')
+	{
+		printf("нашёл начало скобки\n");
+		position++;
+		ret = Get_E();
+		assert(str[position] == ')');
+		printf("нашёл конец скобки\n");
+		position++;
+	}
+	else if (str[position] == 'x')
+	{
+		printf("нашёл х\n");
+		position++;
+		ret = _VAR;
+	}
+	else if (str[position] == 't' && str[position + 1] == 'g')
+	{
+		printf("нашел tg\n");
+		assert(str[position + 2] == '(');
+		position += 3;
+		ret = _TG(Get_E());
+		assert(str[position] == ')');
+		position++;
+	}
+	else if (str[position] == 'l' && str[position + 1] == 'n')
+	{
+		printf("нашел ln\n");
+		assert(str[position + 2] == '(');
+		position += 3;
+		ret = _LN(Get_E());
+		assert(str[position] == ')');
+		position++;
+	}
+	else if (str[position] == 'l' && str[position + 1] == 'o' && str[position + 2] == 'g')
+	{
+		printf("нашел log\n");
+		assert(str[position + 3] == '(');
+		position += 4;
+		Node * base = Get_E();
+		assert(str[position] == ')');
+		position++;
+
+		assert(str[position] == '(');
+		position++;
+		Node * arg = Get_E();
+		assert(str[position] == ')');
+		position++;
+
+		ret = _LOG(base, arg);
+	}
+	else if (str[position] == '-')
+	{
+		position++;
+
+		ret = _MUL(_NUM(-1), Get_E());
+	}
+	else if (str[position] == 'a' && str[position + 1] == 'r' && str[position + 2] == 'c')
+	{
+		position += 3;
+
+		if (str[position] == 's' && str[position + 1] == 'i' && str[position + 2] == 'n')
+		{
+			printf("нашел arcsin\n");
+			assert(str[position + 3] == '(');
+			position += 4;
+			ret = _ARCSIN(Get_E());
+			assert(str[position] == ')');
+			position++;
+		}
+		else if (str[position] == 't' && str[position + 1] == 'g')
+		{
+		printf("нашел arctg\n");
+		assert(str[position + 2] == '(');
+		position += 3;
+		ret = _ARCTG(Get_E());
+		assert(str[position] == ')');
+		position++;
+		}
+		else
+			assert(!"arcsin/arctg");
+	}
+	else if (str[position] == 'e' && str[position + 1] == 'x' && str[position + 2] == 'p')
+	{
+		printf("нашел exp\n");
+		assert(str[position + 3] == '(');
+		position += 4;
+		ret = _EXP(Get_E());
+		assert(str[position] == ')');
+		position++;
+	}
+	else if (str[position] == 's' && str[position + 1] == 'i' && str[position + 2] == 'n')
+	{
+		printf("нашел син\n");
+		assert(str[position + 3] == '(');
+		position += 4;
+		ret = _SIN(Get_E());
+		assert(str[position] == ')');
+		position++;
+	}
+	else if (str[position] == 'c' && str[position + 1] == 'o' && str[position + 2] == 's')
+	{
+		printf("нашел cos\n");
+		assert(str[position + 3] == '(');
+		position += 4;
+		ret = _COS(Get_E());
+		assert(str[position] == ')');
+		position++;
+	}
+	else if ('a' <= str[position] && str[position] <= 'd')
+	{
+		printf("нашёл const\n");
+		ret = _CONST(str[position]);
+		position++;
+	}
+	else
+		ret = Get_N();
+
+	printf("endP\n");
+	assert(ret);
+	return ret;
+}
+
+Node * Get_N()
+{
+	int number = 0;
+	int count = 0;
+
+	printf("beginN\n");
+	while ('0' <= str[position] && str[position] <= '9')
+	{
+		number = number * 10 + str[position] - '0';
+		position++;
+		count++;
+	}
+
+	printf("нашел %d\n", number);
+	assert(count);
+
+	printf("endN\n");
+	return _NUM(number);
 }
 
 void BeginForLatex(Node * root)
@@ -849,7 +987,7 @@ Node * Diff(const Node * root)
 							Node * x = root->Right;
 							Node * a = root->Left;
 
-							assert (!(a->Value == NUMBER) || (a->Value == CONST));
+							assert ((a->Type == NUMBER) || (a->Type == CONST));
 
 							Node * base = _MUL(Copy(x), _LN(Copy(a)));	// x * ln(a)
 
@@ -882,9 +1020,9 @@ Node * Diff(const Node * root)
 					case EXP:	// (exp(x))' = exp(x) * x'
 						{
 							Node * x = root->Right;
-							Node * exp = root;	// exp(x)
+							Node * exp = Copy(root);	// exp(x)
 
-							ret = _MUL(Diff(x), Copy(exp));
+							ret = _MUL(Diff(x), exp);
 
 							break;
 

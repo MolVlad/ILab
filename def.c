@@ -387,8 +387,11 @@ void BeginForLatex(Node * root)
 	fprintf(file_latex, "\\documentclass[a4paper,12pt]{article}\n");
 	fprintf(file_latex, "\\usepackage[T2A]{fontenc}\n");
 	fprintf(file_latex, "\\usepackage[utf8]{inputenc}\n");
+	fprintf(file_latex, "\\usepackage{lscape, pdflscape}\n");
 	fprintf(file_latex, "\\usepackage[english,russian]{babel}\n");
 	fprintf(file_latex, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools, }\n");
+	fprintf(file_latex, "\\usepackage[normalem]{ulem}\n");
+	fprintf(file_latex, "\\topmargin -54pt \\textwidth 190mm \\oddsidemargin-15mm\n");
 	fprintf(file_latex, "\\usepackage[normalem]{ulem}\n");
 
 	fprintf(file_latex, "\\begin{document}\n");
@@ -404,12 +407,10 @@ void EndForLatex(Node * root, Node * res)
 	fprintf(file_latex, "\\text{Окончательно получаем:}");
 	fprintf(file_latex, "\n\\\\[0.5cm]\n");
 
-	fprintf(file_latex, "$\\left(");
-	NodeToLatex(root);
-	fprintf(file_latex, "\\right)^\\prime = \n\\\\[0.5cm]\n");
+	fprintf(file_latex, "$");
 	NodeToLatex(res);
 	fprintf(file_latex, "$\n");
-	fprintf(file_latex, "\n\\end{document}");
+	fprintf(file_latex, "\\end{document}");
 
 	fclose(file_latex);
 

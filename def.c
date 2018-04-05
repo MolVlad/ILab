@@ -88,9 +88,11 @@ int main()
 	Node * res = Diff(root);
 	global_change = 1;
 	Optimization(res);
-	EndForLatex(root, res);
-	PrintToDot(root);
 
+	PrintToDot(res);
+	printf("lol++++//////++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+	EndForLatex(root, res);
+	printf("lol++++//////++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 	DeleteTree(res);
 	DeleteTree(root);
 	free(str);
@@ -387,7 +389,7 @@ void BeginForLatex(Node * root)
 	fprintf(file_latex, "\\documentclass[a4paper,12pt]{article}\n");
 	fprintf(file_latex, "\\usepackage[T2A]{fontenc}\n");
 	fprintf(file_latex, "\\usepackage[utf8]{inputenc}\n");
-	fprintf(file_latex, "\\usepackage{lscape, pdflscape}\n");
+	fprintf(file_latex, "\\usepackage{lscape, pdflscape, rotating}\n");
 	fprintf(file_latex, "\\usepackage[english,russian]{babel}\n");
 	fprintf(file_latex, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools, }\n");
 	fprintf(file_latex, "\\usepackage[normalem]{ulem}\n");
@@ -416,7 +418,7 @@ void EndForLatex(Node * root, Node * res)
 
 	system("pdflatex res.tex");
 	system("rm res.log res.aux");
-	system("rm res.tex");
+//	system("rm res.tex");
 }
 
 void PrintToDot(Node * root)

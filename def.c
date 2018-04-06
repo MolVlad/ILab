@@ -38,11 +38,11 @@ typedef struct Node
 	struct Node * Right;
 } Node;
 
-int global_change;
-FILE * file_dot, * file_latex;
-int dot_counter;
-char * str;
-int position;
+int global_change = 0;
+FILE * file_dot = NULL, * file_latex = NULL;
+int dot_counter = 0;
+char * str = NULL;
+int position = 0;
 
 char ** CapCreate();
 Node * Diff(const Node * root);
@@ -60,7 +60,7 @@ char * FileToStr();
 int FileIsOk(FILE * file);
 int SizeOfFile(FILE * file);
 
-Node * General(const char * formula);
+Node * General(char * formula);
 Node * Get_E();
 Node * Get_T();
 Node * Get_P();
@@ -83,27 +83,36 @@ int main()
 	srand(time(NULL));
 
 	Node * root = ScanTree();
+	assert(root);
 
 	BeginForLatex(root);
 	Node * res = Diff(root);
+	printf("\nдифференцирование завершено успешно\n\n");
+	assert(res);
 	global_change = 1;
 	Optimization(res);
+	assert(res);
 
+	printf("\nоптимизация завершена успешно\n");
 	PrintToDot(res);
-	printf("lol++++//////++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 	EndForLatex(root, res);
-	printf("lol++++//////++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+	assert(root);
+	assert(res);
 	DeleteTree(res);
+	res = NULL;
 	DeleteTree(root);
+	root = NULL;
 	free(str);
+	str = NULL;
 
 	return 0;
 }
 
 char ** CapCreate()
 {
-	char ** a = calloc(20, sizeof(char *));
-	int i;
+	char ** a = (char**)calloc(20, sizeof(char *));
+	assert(a);
+	int i = 0;
 
 	a[0] = "Очевидно, что\n";
 	a[1] = "Заметим, что\n";
@@ -131,9 +140,12 @@ char ** CapCreate()
 
 Node * ScanTree()
 {
-	char * str = FileToStr();
-	Node * root = General(str);
-	free(str);
+	char * str_0 = FileToStr();
+	assert(str_0);
+	assert(strlen(str_0));
+	Node * root = General(str_0);
+	free(str_0);
+	str_0 = NULL;
 
 	assert(root);
 
@@ -142,48 +154,65 @@ Node * ScanTree()
 
 char * FileToStr()
 {
-	FILE * file;
+	FILE * file = NULL;
 	file = fopen("base.txt", "r");
 	assert(file);
 	assert(FileIsOk(file));
 
 	int n = SizeOfFile(file);
-	char * str = (char *) calloc(n+1, sizeof(char));
-	fscanf(file, "%[^~]", str);
+	assert(n);
+	char * str_0 = (char *) calloc(n, sizeof(char));
+	assert(str_0);
+	fscanf(file, "%[^~]", str_0);
+	assert(str_0);
+	printf("размер выражения = %d\n", strlen(str_0));
 	fclose(file);
 
-	return str;
+	return str_0;
 }
 
 int FileIsOk(FILE * file)
 {
 	fseek(file, -2, SEEK_END);
-	char symbol;
+	char symbol = 0;
 	fscanf(file, "%c", &symbol);
+	assert(symbol);
 	fseek(file, 0, SEEK_SET);
+	assert(!ftell(file));
 
 	return symbol == '~';
 }
 
 int SizeOfFile(FILE * file)
 {
-	fseek(file, -2, SEEK_END);
-	int n = ftell(file);
+	assert(file);
+	fseek(file, 0, SEEK_END);
+	int n = 0;
+	n = ftell(file);
+	assert(n);
 	fseek(file, 0, SEEK_SET);
+	assert(!ftell(file));
 
 	return n;
 }
 
-Node * General(const char * formula)
+Node * General(char * formula)
 {
+	assert(!str);
+	assert(formula);
 	int n = strlen(formula);
+	assert(n);
 	str = calloc(n+1, sizeof(char));
+	assert(str);
 	strcpy(str, formula);
+	assert(str);
 	position = 0;
 
 	Node * ret = Get_E();
 
 	assert(str[position] == '\0');
+	printf("\nсчитывание завершено успешно\n\n");
+//	PrintToDot(ret);                                          COMMENT
 
 	return ret;
 }
@@ -418,7 +447,7 @@ void EndForLatex(Node * root, Node * res)
 
 	system("pdflatex res.tex");
 	system("rm res.log res.aux");
-//	system("rm res.tex");
+//	system("rm res.tex");                                COMMENT
 }
 
 void PrintToDot(Node * root)
@@ -440,18 +469,24 @@ void NodeToDot(Node * root)
 {
 	assert(root);
 
+	printf("узел\n");
 	int cur = dot_counter;
 	fprintf(file_dot, "\tN%d [label=\"", cur);
 
+	printf("root->Type = %d\n", root->Type);
 	switch (root->Type)
 	{
 		case NUMBER:
 			{
+				assert(!root->Left);
+				assert(!root->Right);
 				fprintf(file_dot, "%d", root->Value);
 				break;
 			}
 		case CONST:
 			{
+				assert(!root->Left);
+				assert(!root->Right);
 				fprintf(file_dot, "%c", root->Value);
 				break;
 			}
@@ -461,29 +496,43 @@ void NodeToDot(Node * root)
 				{
 					case PLUS:
 						{
+							assert(root->Left);
+							assert(root->Right);
 							fprintf(file_dot, "+");
 							break;
+							printf("нашел +\n");
 						}
 					case MINUS:
 						{
+							assert(root->Left);
+							assert(root->Right);
 							fprintf(file_dot, "-");
 							break;
+							printf("нашел -\n");
 						}
 					case DIVIDE:
 						{
+							assert(root->Left);
+							assert(root->Right);
 							fprintf(file_dot, "/");
 							break;
+							printf("нашел /\n");
 						}
 					case MULTIPLY:
 						{
+							assert(root->Left);
+							assert(root->Right);
 							fprintf(file_dot, "*");
 							break;
+							printf("нашел *\n");
 						}
 				}
 				break;
 			}
 		case VARIABLE:
 			{
+				assert(!root->Left);
+				assert(!root->Right);
 				fprintf(file_dot, "x");
 				break;
 			}
@@ -493,46 +542,64 @@ void NodeToDot(Node * root)
 				{
 					case SIN:
 						{
+							assert(root->Right);
+							assert(!root->Left);
 							fprintf(file_dot, "sin");
 							break;
 						}
 					case COS:
 						{
+							assert(root->Right);
+							assert(!root->Left);
 							fprintf(file_dot, "cos");
 							break;
 						}
 					case TG:
 						{
+							assert(root->Right);
+							assert(!root->Left);
 							fprintf(file_dot, "tg");
 							break;
 						}
 					case ARCSIN:
 						{
+							assert(root->Right);
+							assert(!root->Left);
 							fprintf(file_dot, "arcsin");
 							break;
 						}
 					case ARCTG:
 						{
+							assert(root->Right);
+							assert(!root->Left);
 							fprintf(file_dot, "arctg");
 							break;
 						}
 					case EXP:
 						{
+							assert(root->Right);
+							assert(!root->Left);
 							fprintf(file_dot, "exp");
 							break;
 						}
 					case LOG:
 						{
+							assert(root->Right);
+							assert(root->Left);
 							fprintf(file_dot, "log");
 							break;
 						}
 					case LN:
 						{
+							assert(root->Right);
+							assert(!root->Left);
 							fprintf(file_dot, "ln");
 							break;
 						}
 					case DEGREE:
 						{
+							assert(root->Right);
+							assert(root->Left);
 							fprintf(file_dot, "^");
 							break;
 						}
@@ -564,7 +631,7 @@ void Optimization(Node * root)
 
 		root = Compute(root);
 		root = EasyMultiply(root);
-		root = EasyAddition(root);
+//		root = EasyAddition(root);
 		root = EasyDivide(root);
 
 		assert(root);

@@ -1,1 +1,1 @@
-log(2)(x)+sin(b*x)+45*cos(1/(3*x))-2^x+tg(2*x)-ln(x)*x+exp(c-x)-arctg(x+2)+arcsin(d-x)~
+x^(sin(arctg(a*x)+x^3-x^2))/ln(c+exp(a/x))+tg(sin(cos(x^x)))~

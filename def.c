@@ -415,10 +415,10 @@ void BeginForLatex(Node * root)
 	file_latex = fopen("res.tex", "w");
 	assert(file_latex);
 
-	fprintf(file_latex, "\\documentclass[a4paper,12pt]{article}\n");
+	fprintf(file_latex, "\\documentclass[a2paper,12pt]{article}\n");
 	fprintf(file_latex, "\\usepackage[T2A]{fontenc}\n");
 	fprintf(file_latex, "\\usepackage[utf8]{inputenc}\n");
-	fprintf(file_latex, "\\usepackage{lscape, pdflscape, rotating}\n");
+	fprintf(file_latex, "\\usepackage{lscape, rotating}\n");
 	fprintf(file_latex, "\\usepackage[english,russian]{babel}\n");
 	fprintf(file_latex, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools, }\n");
 	fprintf(file_latex, "\\usepackage[normalem]{ulem}\n");
@@ -438,16 +438,18 @@ void EndForLatex(Node * root, Node * res)
 	fprintf(file_latex, "\\text{Окончательно получаем:}");
 	fprintf(file_latex, "\n\\\\[0.5cm]\n");
 
+	fprintf(file_latex, "\\begin{landscape}");
+	fprintf(file_latex, "\\tiny");
 	fprintf(file_latex, "$");
 	NodeToLatex(res);
 	fprintf(file_latex, "$\n");
+	fprintf(file_latex, "\\end{landscape}");
 	fprintf(file_latex, "\\end{document}");
-
 	fclose(file_latex);
 
 	system("pdflatex res.tex");
 	system("rm res.log res.aux");
-//	system("rm res.tex");                                COMMENT
+	system("rm res.tex");
 }
 
 void PrintToDot(Node * root)
@@ -631,7 +633,7 @@ void Optimization(Node * root)
 
 		root = Compute(root);
 		root = EasyMultiply(root);
-//		root = EasyAddition(root);
+		root = EasyAddition(root);
 		root = EasyDivide(root);
 
 		assert(root);
@@ -718,7 +720,6 @@ Node * EasyAddition(Node * root)
 
 	Node * ret;
 	int change = 0;
-
 	if (!(root->Left && root->Right))
 		return root;
 
@@ -1232,11 +1233,14 @@ void NodeToLatex(const Node * root)
 						}
 					case DIVIDE:
 						{
-							fprintf(file_latex, "\\frac{");
+							fprintf(file_latex, "(");
+							//fprintf(file_latex, "\\frac{");
 							NodeToLatex(root->Left);
-							fprintf(file_latex, "}{");
+							//fprintf(file_latex, "}{");
+							fprintf(file_latex, ")/(");
 							NodeToLatex(root->Right);
-							fprintf(file_latex, "}");
+							fprintf(file_latex, ")");
+							//fprintf(file_latex, "}");
 
 							break;
 						}

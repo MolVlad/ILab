@@ -27,6 +27,10 @@ int IsEmptyStack(Node * stack);
 void ManualStack();
 void UserQuery(Node * stack);
 void DeleteStack(Node * stack);
+Node * MulStack(Node * stack);
+Node * AddStack(Node * stack);
+Node * SubStack(Node * stack);
+Node * DivStack(Node * stack);
 
 int main()
 {
@@ -74,6 +78,71 @@ void PrintStack(Node * stack)
 		printf(" ");
 		PrintStack(stack->Next);
 	}
+}
+
+Node * MulStack(Node * stack)
+{
+	if(IsEmptyStack(stack))
+	{
+		printf("Empty\n");
+	}
+	else
+	{
+		Data a = PopStack(&stack);
+		Data b = PopStack(&stack);
+		stack = PushStack(stack, a * b);
+	}
+
+	return stack;
+}
+
+Node * AddStack(Node * stack)
+{
+	if(IsEmptyStack(stack))
+	{
+		printf("Empty\n");
+	}
+	else
+	{
+		Data a = PopStack(&stack);
+		Data b = PopStack(&stack);
+		stack = PushStack(stack, a + b);
+	}
+
+	return stack;
+}
+
+Node * SubStack(Node * stack)
+{
+	if(IsEmptyStack(stack))
+	{
+		printf("Empty\n");
+	}
+	else
+	{
+		Data a = PopStack(&stack);
+		Data b = PopStack(&stack);
+		stack = PushStack(stack, a - b);
+	}
+
+	return stack;
+}
+
+Node * DivStack(Node * stack)
+{
+	if(IsEmptyStack(stack))
+	{
+		printf("Empty\n");
+	}
+	else
+	{
+		Data a = PopStack(&stack);
+		Data b = PopStack(&stack);
+		stack = PushStack(stack, a / b);
+		stack = PushStack(stack, a % b);
+	}
+
+	return stack;
 }
 
 void DotStack(Node * stack)
@@ -148,6 +217,10 @@ void ManualStack()
 	printf("'size'\t\t--\tprint size of stack\n");
 	printf("'dot'\t\t--\tprint to dot\n");
 	printf("'push n'\t--\tput on the stack\n");
+	printf("'add'\t\t--\tpop two elements, add and push\n");
+	printf("'sub'\t\t--\tpop two elements, sub and push\n");
+	printf("'mul'\t\t--\tpop two elements, mul and push\n");
+	printf("'div'\t\t--\tpop two elements, div, push div, then push mod\n");
 	printf("'top'\t\t--\tprint the top of the stack\n");
 	printf("---|Manual for stack|---\n");
 	printf("\n");
@@ -172,6 +245,10 @@ void UserQuery(Node * stack)
 	char push[] = "push";
 	char dot[] = "dot";
 	char top[] = "top";
+	char add[] = "add";
+	char sub[] = "sub";
+	char mul[] = "mul";
+	char div[] = "div";
 
 	char * word = calloc(WordSize, sizeof(char));
 	int n;
@@ -219,6 +296,42 @@ void UserQuery(Node * stack)
 				printf("Empty\n");
 			else
 				printf("%d\n", CopyTopStack(stack));
+		}
+		else if(!strcmp(word, add))
+		{
+			if (IsEmptyStack(stack))
+				printf("Empty\n");
+			else if(stack->Number == 1)
+				printf("Not enough\n");
+			else
+				stack = AddStack(stack);
+		}
+		else if(!strcmp(word, sub))
+		{
+			if (IsEmptyStack(stack))
+				printf("Empty\n");
+			else if(stack->Number == 1)
+				printf("Not enough\n");
+			else
+				stack = SubStack(stack);
+		}
+		else if(!strcmp(word, mul))
+		{
+			if (IsEmptyStack(stack))
+				printf("Empty\n");
+			else if(stack->Number == 1)
+				printf("Not enough\n");
+			else
+				stack = MulStack(stack);
+		}
+		else if(!strcmp(word, div))
+		{
+			if (IsEmptyStack(stack))
+				printf("Empty\n");
+			else if(stack->Number == 1)
+				printf("Not enough\n");
+			else
+				stack = DivStack(stack);
 		}
 		else
 		{

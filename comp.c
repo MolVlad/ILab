@@ -13,15 +13,18 @@
 
 char * FileToStr();
 
+Node * sp;
+int rax, rbx, rcx, rdx;
+
 int main()
 {
-	Node * sp = CreateStack();
-	int rax, rbx, rcx, rdx;
+	sp = CreateStack();
+	rax = rbx = rcx = rdx = 0;
 
-	сhar * str = FileToStr();
-	Token * tokens = LexicalAnalysis(str);
-	Tree_Node * root = CreateTree(tokens);
-	Run(root);
+	char * str = FileToStr();
+//	Token * tokens = LexicalAnalysis(str);
+//	Tree_Node * root = CreateTree(tokens);
+//	Run(root);
 
 	return 0;
 }

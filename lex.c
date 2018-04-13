@@ -1,4 +1,6 @@
 int SizeOfFile(FILE * file);
+Token * CreateToken(Token * tokens, int type, int value);
+void DotToken(Token * tokens);
 
 char * FileToStr()
 {
@@ -39,6 +41,176 @@ int SizeOfFile(FILE * file)
 
 Token * LexicalAnalysis(char * str)
 {
-	printf("Считывание")
+	printf("---|Лексический анализ текста программы|---\n");
+
+	int position = 0;
+	int size = strlen(str);
+	Token * tokens = NULL;
+
+	while(position <= size)
+	{
+		//---|BIN_OPERATORS|---
+		if(str[position] == '+')
+		{
+			CreateToken(tokens, BIN_OPERATOR, PLUS);
+			position++;
+		}
+		if(str[position] == '-')
+		{
+			CreateToken(tokens, BIN_OPERATOR, MINUS);
+			position++;
+		}
+		if(str[position] == '*')
+		{
+			CreateToken(tokens, BIN_OPERATOR, MULTIPLY);
+			position++;
+		}
+		if(str[position] == '/')
+		{
+			CreateToken(tokens, BIN_OPERATOR, DIVIDE);
+			position++;
+		}
+		//---|OPERATORS|---
+		if()
+		{
+			
+			CreateToken(tokens, OPERATOR, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, OPERATOR, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, OPERATOR, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, OPERATOR, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, OPERATOR, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, OPERATOR, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, OPERATOR, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, OPERATOR, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, OPERATOR, );
+		}
+		//---|REGISTERS|---
+		if()
+		{
+			
+			CreateToken(tokens, REGISTER, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, REGISTER, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, REGISTER, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, REGISTER, );
+		}
+		//---|FUNCTIONS|---
+		if()
+		{
+			
+			CreateToken(tokens, FUNCTION, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, FUNCTION, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, FUNCTION, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, FUNCTION, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, FUNCTION, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, FUNCTION, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, FUNCTION, );
+		}
+		if()
+		{
+			
+			CreateToken(tokens, FUNCTION, );
+		}	
+	}
+
+	printf("---|Лексический анализ завершен|---\n");
+	printf("---|Вывод в Dot|---\n\n");
+	DotToken(tokens);
+	printf("\n---|Вывод в Dot завершен успешно|---\n");
+
+	return Token;
 }
+
+void DotToken(Token * tokens)
+{
+	
+
+}
+
+Token * CreateToken(Token * tokens, int type, int value)
+{
+	Token * new_token = calloc(1, sizeof(Token));
+
+	if(!tokens)
+	{
+		new_token->Next = tokens;
+		new_token->Type - type;
+		new_token->Value = value;
+	}
+	else
+		new_token = CreateToken(tokens->Next, type, value);
+
+	return new_token;
+}
+
+
+
+
 

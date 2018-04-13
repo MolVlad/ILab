@@ -22,9 +22,8 @@ int main()
 	rax = rbx = rcx = rdx = 0;
 
 	char * str = FileToStr();
-//	Token * tokens = LexicalAnalysis(str);
-//	Tree_Node * root = CreateTree(tokens);
-//	Run(root);
+	Token * tokens = LexicalAnalysis(str);
+//	Run(tokens);
 
 	return 0;
 }

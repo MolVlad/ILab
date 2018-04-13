@@ -1,6 +1,6 @@
 #define WordSize 30
 
-FILE * file_dot;
+FILE * file_dot_stack;
 
 void NodeToDot(Node * stack);
 
@@ -107,30 +107,30 @@ Node * DivStack(Node * stack)
 void DotStack(Node * stack)
 {
 	assert(stack);
-	file_dot = NULL;
+	file_dot_stack = NULL;
 
-	file_dot = fopen("tree.dot", "w");
-	assert(file_dot);
-	fprintf(file_dot, "digraph G {\n");
+	file_dot_stack = fopen("stack.dot", "w");
+	assert(file_dot_stack);
+	fprintf(file_dot_stack, "digraph G {\n");
 	NodeToDot(stack);
-	fprintf(file_dot, "}");
-	fclose(file_dot);
+	fprintf(file_dot_stack, "}");
+	fclose(file_dot_stack);
 
-	system("dot -v -Tpng -o tree tree.dot");
-	system("rm tree.dot");
-	printf("\nSuccesfully\n");
+	system("dot -v -Tpng -o stack stack.dot");
+	system("rm stack.dot");
+	printf("\n---|Вывод в Dot завершен|---\n");
 }
 
 void NodeToDot(Node * stack)
 {
 	assert(stack);
 
-	fprintf(file_dot, "\tN%d [label=\"", stack->Number);
-	fprintf(file_dot, "value - %d, number - %d", stack->Value, stack->Number);
-	fprintf(file_dot, "\"]\n");
+	fprintf(file_dot_stack, "\tN%d [label=\"", stack->Number);
+	fprintf(file_dot_stack, "value - %d, number - %d", stack->Value, stack->Number);
+	fprintf(file_dot_stack, "\"]\n");
 	if (stack->Next)
 	{
-		fprintf(file_dot, "\tN%d->N%d\n", stack->Number, stack->Next->Number);
+		fprintf(file_dot_stack, "\tN%d->N%d\n", stack->Number, stack->Next->Number);
 		NodeToDot(stack->Next);
 	}
 }

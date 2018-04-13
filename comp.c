@@ -6,8 +6,6 @@
 #include "stack.c"
 #include "lex.h"
 #include "lex.c"
-#include "tree.h"
-#include "tree.c"
 #include "run.h"
 #include "run.c"
 

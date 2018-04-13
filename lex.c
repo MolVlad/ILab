@@ -1,6 +1,12 @@
+FILE * file_dot_token;
+int dot_token_counter;
+char * dot_semantics;
+
 int SizeOfFile(FILE * file);
 Token * CreateToken(Token * tokens, int type, int value);
+void TokenToDot(Token * token);
 void DotToken(Token * tokens);
+char * GetSemantics(Token * token);
 
 char * FileToStr()
 {
@@ -19,7 +25,7 @@ char * FileToStr()
 	printf("Считывание прошло нормально\n");
 	printf("Размер программы - %lu символов\n", strlen(str));
 	printf("---|Исходный текст программы|---\n");
-	printf("%s\n\n", str);
+	printf("%s", str);
 	printf("---|Исходный текст программы|---\n\n");
 	fclose(file);
 
@@ -47,30 +53,32 @@ Token * LexicalAnalysis(char * str)
 	int size = strlen(str);
 	Token * tokens = NULL;
 
-	while(position <= size)
+	while(position < size)
 	{
+		if(str[position] == '\n')
+			position++;
 		//---|BIN_OPERATORS|---
-		if(str[position] == '+')
+		else if(str[position] == '+')
 		{
-			CreateToken(tokens, BIN_OPERATOR, PLUS);
+			tokens = CreateToken(tokens, BIN_OPERATOR, PLUS);
 			position++;
 		}
-		if(str[position] == '-')
+		else if(str[position] == '-')
 		{
-			CreateToken(tokens, BIN_OPERATOR, MINUS);
+			tokens = CreateToken(tokens, BIN_OPERATOR, MINUS);
 			position++;
 		}
-		if(str[position] == '*')
+		else if(str[position] == '*')
 		{
-			CreateToken(tokens, BIN_OPERATOR, MULTIPLY);
+			tokens = CreateToken(tokens, BIN_OPERATOR, MULTIPLY);
 			position++;
 		}
-		if(str[position] == '/')
+		else if(str[position] == '/')
 		{
-			CreateToken(tokens, BIN_OPERATOR, DIVIDE);
+			tokens = CreateToken(tokens, BIN_OPERATOR, DIVIDE);
 			position++;
 		}
-		//---|OPERATORS|---
+/*		//---|OPERATORS|---
 		if()
 		{
 			
@@ -177,37 +185,109 @@ Token * LexicalAnalysis(char * str)
 		{
 			
 			CreateToken(tokens, FUNCTION, );
-		}	
+		}*/
 	}
 
 	printf("---|Лексический анализ завершен|---\n");
 	printf("---|Вывод в Dot|---\n\n");
 	DotToken(tokens);
-	printf("\n---|Вывод в Dot завершен успешно|---\n");
+	printf("\n---|Вывод в Dot завершен|---\n");
 
-	return Token;
+	return tokens;
 }
 
 void DotToken(Token * tokens)
 {
-	
+	assert(tokens);
+	file_dot_token = NULL;
 
+	file_dot_token = fopen("tokens.dot", "w");
+	assert(file_dot_token);
+	fprintf(file_dot_token, "digraph G {\n");
+	dot_token_counter = 0;
+	TokenToDot(tokens);
+	fprintf(file_dot_token, "}");
+	fclose(file_dot_token);
+
+	system("dot -v -Tpng -o tokens tokens.dot");
+	system("rm tokens.dot");
+}
+
+void TokenToDot(Token * token)
+{
+	assert(token);
+
+	dot_semantics = GetSemantics(token);
+	fprintf(file_dot_token, "\tN%d [label=\"", dot_token_counter);
+	fprintf(file_dot_token, "%s", dot_semantics);
+	fprintf(file_dot_token, "\"]\n");
+	if (token->Next)
+	{
+		fprintf(file_dot_token, "\tN%d->N%d\n", dot_token_counter, dot_token_counter+1);
+		dot_token_counter++;
+		TokenToDot(token->Next);
+	}
+}
+
+char * GetSemantics(Token * token)
+{
+	switch(token->Type)
+	{
+		case BIN_OPERATOR:
+			switch(token->Value)
+			{
+				case PLUS:
+					return "+";
+				case MINUS:
+					return "-";
+				case DIVIDE:
+					return "/";
+				case MULTIPLY:
+					return "*";
+			}
+/*		case OPERATOR:
+			return "OPERATOR";
+		case NUMBER:
+			return "NUMBER";
+		case REGISTER:
+			*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	}
 }
 
 Token * CreateToken(Token * tokens, int type, int value)
 {
-	Token * new_token = calloc(1, sizeof(Token));
-
 	if(!tokens)
 	{
-		new_token->Next = tokens;
-		new_token->Type - type;
-		new_token->Value = value;
+		tokens = calloc(1, sizeof(Token));
+		tokens->Next = NULL;
+		tokens->Type - type;
+		tokens->Value = value;
+
+		return tokens;
 	}
 	else
-		new_token = CreateToken(tokens->Next, type, value);
+		tokens->Next = CreateToken(tokens->Next, type, value);
 
-	return new_token;
+		return tokens;
 }
 
 

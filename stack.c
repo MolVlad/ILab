@@ -1,25 +1,8 @@
-#include "stack.h"
-
 #define WordSize 30
 
 FILE * file_dot;
 
-int main()
-{
-	Node * stack = CreateStack();
-
-	stack = PushStack(stack, 3);
-	stack = PushStack(stack, 2);
-	stack = PushStack(stack, 5);
-	stack = PushStack(stack, 4);
-
-	AddStack(stack);
-//	DotStack(stack);
-	PrintStack(stack);
-//	DeleteStack(stack);
-
-	return 0;
-}
+void NodeToDot(Node * stack);
 
 Node * CreateStack()
 {

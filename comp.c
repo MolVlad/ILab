@@ -4,31 +4,27 @@
 #include <string.h>
 #include "stack.h"
 #include "stack.c"
+#include "lex.h"
+#include "lex.c"
+#include "tree.h"
+#include "tree.c"
+#include "run.h"
+#include "run.c"
 
-enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};
-
-enum {PLUS, MINUS, DIVIDE, MULTIPLY};	// BIN_OPERATOR
-enum {SIN, COS, TG, ARCSIN, ARCTG, EXP, LOG, LN, DEGREE};	//OPERATOR
-enum {RAX, RBX, RCX, RDX};	// REGISTER
-enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	// FUNCTION
+char * FileToStr();
 
 int main()
 {
-/*	Node * stack = CreateStack();
+	Node * sp = CreateStack();
+	int rax, rbx, rcx, rdx;
 
-	stack = PushStack(stack, 3);
-	stack = PushStack(stack, 2);
-	stack = PushStack(stack, 5);
-	stack = PushStack(stack, 4);
+	сhar * str = FileToStr();
+	Token * tokens = LexicalAnalysis(str);
+	Tree_Node * root = CreateTree(tokens);
+	Run(root);
 
-	AddStack(stack);
-	DotStack(stack);
-	PrintStack(stack);
-//	DeleteStack(stack);
-*/
 	return 0;
 }
-
 
 
 

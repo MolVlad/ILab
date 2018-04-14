@@ -20,6 +20,7 @@ int main()
 	rax = rbx = rcx = rdx = 0;
 
 	char * str = FileToStr();
+	printf("ASDGHJHJEGIOERG\n\n\n\n");
 	Token * tokens = LexicalAnalysis(str);
 //	Run(tokens);
 

@@ -27,7 +27,7 @@ char * FileToStr()
 	printf("---|Исходный текст программы|---\n");
 	printf("%s", str);
 	printf("---|Исходный текст программы|---\n\n");
-	fclose(file);
+//	fclose(file);
 
 	return str;
 }
@@ -55,9 +55,11 @@ Token * LexicalAnalysis(char * str)
 
 	while(position < size)
 	{
-		if(str[position] == '\n')
+		if(str[position] == '\n' || str[position] == ' ')
 			position++;
-		//---|BIN_OPERATORS|---
+		else if(str[position] == '(' || str[position] == ')')
+			position++;
+//---|BIN_OPERATORS|---
 		else if(str[position] == '+')
 		{
 			tokens = CreateToken(tokens, BIN_OPERATOR, PLUS);
@@ -78,74 +80,64 @@ Token * LexicalAnalysis(char * str)
 			tokens = CreateToken(tokens, BIN_OPERATOR, DIVIDE);
 			position++;
 		}
-/*		//---|OPERATORS|---
-		if()
+		else if(str[position] == '^')
 		{
-			
-			CreateToken(tokens, OPERATOR, );
+			tokens = CreateToken(tokens, BIN_OPERATOR, DEGREE);
+			position++;
 		}
-		if()
+//---|OPERATORS|---
+		else if(str[position] == 's' && str[position + 1] == 'i' && str[position + 2] == 'n')
 		{
-			
-			CreateToken(tokens, OPERATOR, );
+			position += 3;
+			assert(str[position] == '(');
+			tokens = CreateToken(tokens, OPERATOR, SIN);
 		}
-		if()
+		else if(str[position] == 'c' && str[position + 1] == 'o' && str[position + 2] == 's')
 		{
-			
-			CreateToken(tokens, OPERATOR, );
+			position += 3;
+			assert(str[position] == '(');
+			tokens = CreateToken(tokens, OPERATOR, COS);
 		}
-		if()
+		else if(str[position] == 't' && str[position + 1] == 'g')
 		{
-			
-			CreateToken(tokens, OPERATOR, );
+			position += 2;
+			assert(str[position] == '(');
+			tokens = CreateToken(tokens, OPERATOR, TG);
 		}
-		if()
+		else if(str[position] == 'l' && str[position + 1] == 'n')
 		{
-			
-			CreateToken(tokens, OPERATOR, );
+			position += 2;
+			assert(str[position] == '(');
+			tokens = CreateToken(tokens, OPERATOR, LN);
 		}
-		if()
+//---|REGISTERS|---
+		else if(str[position] == 'r'&& str[position + 1] == 'a' && str[position + 2] == 'x'
+				&& (str[position + 3] == ' ' || str[position + 3] == '\n' || str[position] == ')'))
 		{
-			
-			CreateToken(tokens, OPERATOR, );
+			position += 3;
+			tokens = CreateToken(tokens, REGISTER, RAX);
 		}
-		if()
+		else if(str[position] == 'r'&& str[position + 1] == 'b' && str[position + 2] == 'x'
+				&& (str[position + 3] == ' ' || str[position + 3] == '\n' || str[position] == ')'))
 		{
-			
-			CreateToken(tokens, OPERATOR, );
+			position += 3;
+			tokens = CreateToken(tokens, REGISTER, RBX);
 		}
-		if()
+		else if(str[position] == 'r'&& str[position + 1] == 'c' && str[position + 2] == 'x'
+				&& (str[position + 3] == ' ' || str[position + 3] == '\n' || str[position] == ')'))
 		{
-			
-			CreateToken(tokens, OPERATOR, );
+			position += 3;
+			tokens = CreateToken(tokens, REGISTER, RCX);
 		}
-		if()
+		else if(str[position] == 'r'&& str[position + 1] == 'd' && str[position + 2] == 'x'
+				&& (str[position + 3] == ' ' || str[position + 3] == '\n' || str[position] == ')'))
 		{
-			
-			CreateToken(tokens, OPERATOR, );
+			position += 3;
+			tokens = CreateToken(tokens, REGISTER, RDX);
 		}
-		//---|REGISTERS|---
-		if()
-		{
-			
-			CreateToken(tokens, REGISTER, );
-		}
-		if()
-		{
-			
-			CreateToken(tokens, REGISTER, );
-		}
-		if()
-		{
-			
-			CreateToken(tokens, REGISTER, );
-		}
-		if()
-		{
-			
-			CreateToken(tokens, REGISTER, );
-		}
-		//---|FUNCTIONS|---
+		else
+			assert(!"wtf");
+/*//---|FUNCTIONS|---
 		if()
 		{
 			
@@ -244,32 +236,42 @@ char * GetSemantics(Token * token)
 					return "/";
 				case MULTIPLY:
 					return "*";
+				case DEGREE:
+					return "^";
+				default:
+					assert(!"wtf");
 			}
-/*		case OPERATOR:
-			return "OPERATOR";
-		case NUMBER:
-			return "NUMBER";
+			break;
+		case OPERATOR:
+			switch(token->Value)
+			{
+				case SIN:
+					return "sin";
+				case COS:
+					return "cos";
+				case TG:
+					return "TG";
+				case LN:
+					return "LN";
+				default:
+					assert(!"wtf");
+			}
+			break;
 		case REGISTER:
-			*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			switch(token->Value)
+			{
+				case RAX:
+					return "rax";
+				case RBX:
+					return "rbx";
+				case RCX:
+					return "rcx";
+				case RDX:
+					return "rdx";
+			}
+			break;
+		default:
+			assert(!"wtf");
 	}
 }
 

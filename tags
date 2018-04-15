@@ -7,6 +7,8 @@
 ADD	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
 AddStack	stack.c	/^Node * AddStack(Node * stack)$/;"	f
 BIN_OPERATOR	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
+BRACKET_CLOSE	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon6
+BRACKET_OPENING	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon6
 CONST	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
 COS	lex.h	/^enum {SIN, COS, TG, LN};	\/\/OPERATOR$/;"	e	enum:__anon3
 CopyTopStack	stack.c	/^Data CopyTopStack(Node * stack)$/;"	f
@@ -20,6 +22,7 @@ DeleteStack	stack.c	/^void DeleteStack(Node * stack)$/;"	f
 DivStack	stack.c	/^Node * DivStack(Node * stack)$/;"	f
 DotStack	stack.c	/^void DotStack(Node * stack)$/;"	f
 DotToken	lex.c	/^void DotToken(Token * tokens)$/;"	f
+EQUALITY	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon6
 FUNCTION	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
 FileToStr	lex.c	/^char * FileToStr()$/;"	f
 GetSemantics	lex.c	/^char * GetSemantics(Token * token)$/;"	f
@@ -31,8 +34,9 @@ MINUS	lex.h	/^enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};	\/\/ BIN_OPERATOR$/;
 MUL	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
 MULTIPLY	lex.h	/^enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};	\/\/ BIN_OPERATOR$/;"	e	enum:__anon2
 MulStack	stack.c	/^Node * MulStack(Node * stack)$/;"	f
+NEW_LINE	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon6
 NUMBER	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
-Next	lex.h	/^	struct Token * Next;$/;"	m	struct:__anon6	typeref:struct:__anon6::Token
+Next	lex.h	/^	struct Token * Next;$/;"	m	struct:__anon7	typeref:struct:__anon7::Token
 Next	stack.h	/^			struct Node * Next;$/;"	m	struct:Node	typeref:struct:Node::Node
 Node	stack.h	/^typedef struct Node$/;"	s
 Node	stack.h	/^} Node;$/;"	t	typeref:struct:Node
@@ -58,10 +62,10 @@ SizeOfFile	lex.c	/^int SizeOfFile(FILE * file)$/;"	f
 SizeStack	stack.c	/^int SizeStack(Node * stack)$/;"	f
 SubStack	stack.c	/^Node * SubStack(Node * stack)$/;"	f
 TG	lex.h	/^enum {SIN, COS, TG, LN};	\/\/OPERATOR$/;"	e	enum:__anon3
-Token	lex.h	/^} Token;$/;"	t	typeref:struct:__anon6
+Token	lex.h	/^} Token;$/;"	t	typeref:struct:__anon7
 TokenToDot	lex.c	/^void TokenToDot(Token * token)$/;"	f
-Type	lex.h	/^	int Type;$/;"	m	struct:__anon6
-Value	lex.h	/^	int Value;$/;"	m	struct:__anon6
+Type	lex.h	/^	int Type;$/;"	m	struct:__anon7
+Value	lex.h	/^	int Value;$/;"	m	struct:__anon7
 Value	stack.h	/^				Data Value;$/;"	m	struct:Node
 WordSize	stack.c	1;"	d	file:
 dot_semantics	lex.c	/^char * dot_semantics;$/;"	v

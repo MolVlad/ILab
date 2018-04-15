@@ -1,1 +1,21 @@
-+- - + /* */
+in rax
+in rbx
+rcx = sin(rax)
+rdx = cos(rbx)
+rcx = rcx + rax
+rdx = rdx - rbx
+push rcx
+push rdx
+add
+push rax
+mul
+push rbx
+div
+push rax
+sub
+pop rcx
+out rcx
+rax = tg(rdx - rax)
+rdx = ln(rbx)
+rcx = rdx ^ rbx
+out rcx

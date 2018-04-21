@@ -52,6 +52,7 @@ Node * MulStack(Node * stack)
 		Data a = PopStack(&stack);
 		Data b = PopStack(&stack);
 		stack = PushStack(stack, a * b);
+		printf("%d * %d = %d to stack\n", a, b, a * b);
 	}
 
 	return stack;
@@ -68,6 +69,8 @@ Node * AddStack(Node * stack)
 		Data a = PopStack(&stack);
 		Data b = PopStack(&stack);
 		stack = PushStack(stack, a + b);
+
+		printf("%d + %d = %d to stack\n", a, b, a + b);
 	}
 
 	return stack;
@@ -84,6 +87,7 @@ Node * SubStack(Node * stack)
 		Data a = PopStack(&stack);
 		Data b = PopStack(&stack);
 		stack = PushStack(stack, a - b);
+		printf("%d - %d = %d to stack\n", a, b, a - b);
 	}
 
 	return stack;
@@ -99,8 +103,10 @@ Node * DivStack(Node * stack)
 	{
 		Data a = PopStack(&stack);
 		Data b = PopStack(&stack);
-		stack = PushStack(stack, a / b);
 		stack = PushStack(stack, a % b);
+		printf("modulo %d / %d = %d to stack\n", a, b, a % b);
+		stack = PushStack(stack, a / b);
+		printf("the whole part %d / %d = %d to stack\n", a, b, a / b);
 	}
 
 	return stack;

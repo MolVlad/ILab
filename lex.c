@@ -58,6 +58,7 @@ Token * LexicalAnalysis(char * str)
 
 	while(position < size)
 	{
+	//---|NUMBERS|---
 		if('0' <= str[position] && str[position] <= '9')
 		{
 			int num = 0;
@@ -104,27 +105,6 @@ Token * LexicalAnalysis(char * str)
 		{
 			tokens = CreateToken(tokens, BIN_OPERATOR, DEGREE);
 			position++;
-		}
-		//---|OPERATORS|---
-		else if(str[position] == 's' && str[position + 1] == 'i' && str[position + 2] == 'n' && str[position + 3] == '(')
-		{
-			position += 3;
-			tokens = CreateToken(tokens, OPERATOR, SIN);
-		}
-		else if(str[position] == 'c' && str[position + 1] == 'o' && str[position + 2] == 's' && str[position + 3] == '(')
-		{
-			position += 3;
-			tokens = CreateToken(tokens, OPERATOR, COS);
-		}
-		else if(str[position] == 't' && str[position + 1] == 'g' && str[position + 2] == '(')
-		{
-			position += 2;
-			tokens = CreateToken(tokens, OPERATOR, TG);
-		}
-		else if(str[position] == 'l' && str[position + 1] == 'n' && str[position + 2] == '(')
-		{
-			position += 2;
-			tokens = CreateToken(tokens, OPERATOR, LN);
 		}
 		//---|REGISTERS|---
 		else if(str[position] == 'r'&& str[position + 1] == 'a' && str[position + 2] == 'x'
@@ -297,21 +277,6 @@ char * GetSemantics(Token * token)
 					return "*";
 				case DEGREE:
 					return "^";
-				default:
-					assert(!"wtf");
-			}
-			break;
-		case OPERATOR:
-			switch(token->Value)
-			{
-				case SIN:
-					return "sin";
-				case COS:
-					return "cos";
-				case TG:
-					return "tg";
-				case LN:
-					return "ln";
 				default:
 					assert(!"wtf");
 			}

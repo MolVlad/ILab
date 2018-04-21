@@ -4,103 +4,80 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-ADD	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
-AddStack	lol.c	/^Node * AddStack(Node * stack)$/;"	f
+ADD	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon4
 AddStack	stack.c	/^Node * AddStack(Node * stack)$/;"	f
-BIN_OPERATOR	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
-BRACKET_CLOSE	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon6
-BRACKET_OPENING	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon6
-CONST	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
-COS	lex.h	/^enum {SIN, COS, TG, LN};	\/\/OPERATOR$/;"	e	enum:__anon3
-CopyTopStack	lol.c	/^Data CopyTopStack(Node * stack)$/;"	f
+BIN_OPERATOR	lex.h	/^enum {BIN_OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
+BRACKET_CLOSE	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon5
+BRACKET_OPENING	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon5
+CONST	lex.h	/^enum {BIN_OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
 CopyTopStack	stack.c	/^Data CopyTopStack(Node * stack)$/;"	f
-CreateStack	lol.c	/^Node * CreateStack()$/;"	f
 CreateStack	stack.c	/^Node * CreateStack()$/;"	f
 CreateToken	lex.c	/^Token * CreateToken(Token * tokens, int type, int value)$/;"	f
 DEGREE	lex.h	/^enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};	\/\/ BIN_OPERATOR$/;"	e	enum:__anon2
-DIV	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
+DIV	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon4
 DIVIDE	lex.h	/^enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};	\/\/ BIN_OPERATOR$/;"	e	enum:__anon2
-Data	lol.c	/^typedef int Data;$/;"	t	file:
 Data	stack.h	/^typedef int Data;$/;"	t
-DeleteStack	lol.c	/^void DeleteStack(Node * stack)$/;"	f
 DeleteStack	stack.c	/^void DeleteStack(Node * stack)$/;"	f
-DivStack	lol.c	/^Node * DivStack(Node * stack)$/;"	f
 DivStack	stack.c	/^Node * DivStack(Node * stack)$/;"	f
-DotStack	lol.c	/^void DotStack(Node * stack)$/;"	f
 DotStack	stack.c	/^void DotStack(Node * stack)$/;"	f
 DotToken	lex.c	/^void DotToken(Token * tokens)$/;"	f
-EQUALITY	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon6
-FUNCTION	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
+EQUALITY	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon5
+FUNCTION	lex.h	/^enum {BIN_OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
 FileToStr	lex.c	/^char * FileToStr()$/;"	f
+GetG	run.c	/^int GetG(Token * tokens)$/;"	f
 GetSemantics	lex.c	/^char * GetSemantics(Token * token)$/;"	f
-IN	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
-IsEmptyStack	lol.c	/^int IsEmptyStack(Node * stack)$/;"	f
+IN	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon4
 IsEmptyStack	stack.c	/^int IsEmptyStack(Node * stack)$/;"	f
-LN	lex.h	/^enum {SIN, COS, TG, LN};	\/\/OPERATOR$/;"	e	enum:__anon3
+IsEnd	run.c	/^int IsEnd(Token * tokens)$/;"	f
+IsEquality	run.c	/^int IsEquality(Token * token)$/;"	f
+IsNewStr	run.c	/^int IsNewStr(Token * tokens)$/;"	f
 LexicalAnalysis	lex.c	/^Token * LexicalAnalysis(char * str)$/;"	f
 MINUS	lex.h	/^enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};	\/\/ BIN_OPERATOR$/;"	e	enum:__anon2
-MUL	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
+MUL	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon4
 MULTIPLY	lex.h	/^enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};	\/\/ BIN_OPERATOR$/;"	e	enum:__anon2
-ManualStack	lol.c	/^void ManualStack()$/;"	f
-MulStack	lol.c	/^Node * MulStack(Node * stack)$/;"	f
+Minus	lex.c	2;"	d	file:
 MulStack	stack.c	/^Node * MulStack(Node * stack)$/;"	f
-NEW_LINE	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon6
-NUMBER	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
-Next	lex.h	/^	struct Token * Next;$/;"	m	struct:__anon7	typeref:struct:__anon7::Token
-Next	lol.c	/^	struct Node * Next;$/;"	m	struct:Node	typeref:struct:Node::Node	file:
+NEW_LINE	lex.h	/^enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	\/\/PUNCTUATION$/;"	e	enum:__anon5
+NUMBER	lex.h	/^enum {BIN_OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
+Next	lex.h	/^	struct Token * Next;$/;"	m	struct:__anon6	typeref:struct:__anon6::Token
 Next	stack.h	/^	struct Node * Next;$/;"	m	struct:Node	typeref:struct:Node::Node
-Node	lol.c	/^typedef struct Node$/;"	s	file:
-Node	lol.c	/^} Node;$/;"	t	typeref:struct:Node	file:
 Node	stack.h	/^typedef struct Node$/;"	s
 Node	stack.h	/^} Node;$/;"	t	typeref:struct:Node
-NodeToDot	lol.c	/^void NodeToDot(Node * stack)$/;"	f
 NodeToDot	stack.c	/^void NodeToDot(Node * stack)$/;"	f
-Number	lol.c	/^	int Number;$/;"	m	struct:Node	file:
 Number	stack.h	/^	int Number;$/;"	m	struct:Node
-OPERATOR	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
-OUT	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
+OUT	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon4
 PLUS	lex.h	/^enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};	\/\/ BIN_OPERATOR$/;"	e	enum:__anon2
-POP	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
-PUNCTUATION	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
-PUSH	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
-PopStack	lol.c	/^Data PopStack(Node ** stack)$/;"	f
+POP	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon4
+PUNCTUATION	lex.h	/^enum {BIN_OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
+PUSH	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon4
+Plus	lex.c	1;"	d	file:
 PopStack	stack.c	/^Data PopStack(Node ** stack)$/;"	f
-PopToken	lex.c	/^Token * PopToken(Token * tokens)$/;"	f
-PrintStack	lol.c	/^void PrintStack(Node * stack)$/;"	f
+PopToken	lex.c	/^Token * PopToken(Token ** tokens)$/;"	f
 PrintStack	stack.c	/^void PrintStack(Node * stack)$/;"	f
-PushStack	lol.c	/^Node * PushStack(Node * stack, Data value)$/;"	f
 PushStack	stack.c	/^Node * PushStack(Node * stack, Data value)$/;"	f
-RAX	lex.h	/^enum {RAX, RBX, RCX, RDX};	\/\/ REGISTER$/;"	e	enum:__anon4
-RBX	lex.h	/^enum {RAX, RBX, RCX, RDX};	\/\/ REGISTER$/;"	e	enum:__anon4
-RCX	lex.h	/^enum {RAX, RBX, RCX, RDX};	\/\/ REGISTER$/;"	e	enum:__anon4
-RDX	lex.h	/^enum {RAX, RBX, RCX, RDX};	\/\/ REGISTER$/;"	e	enum:__anon4
-REGISTER	lex.h	/^enum {BIN_OPERATOR, OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
-SIN	lex.h	/^enum {SIN, COS, TG, LN};	\/\/OPERATOR$/;"	e	enum:__anon3
-SUB	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon5
+RAX	lex.h	/^enum {RAX, RBX, RCX, RDX};	\/\/ REGISTER$/;"	e	enum:__anon3
+RBX	lex.h	/^enum {RAX, RBX, RCX, RDX};	\/\/ REGISTER$/;"	e	enum:__anon3
+RCX	lex.h	/^enum {RAX, RBX, RCX, RDX};	\/\/ REGISTER$/;"	e	enum:__anon3
+RDX	lex.h	/^enum {RAX, RBX, RCX, RDX};	\/\/ REGISTER$/;"	e	enum:__anon3
+REGISTER	lex.h	/^enum {BIN_OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};$/;"	e	enum:__anon1
+Run	run.c	/^void Run(Token * tokens)$/;"	f
+SUB	lex.h	/^enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	\/\/ FUNCTION$/;"	e	enum:__anon4
 SizeOfFile	lex.c	/^int SizeOfFile(FILE * file)$/;"	f
-SizeStack	lol.c	/^int SizeStack(Node * stack)$/;"	f
 SizeStack	stack.c	/^int SizeStack(Node * stack)$/;"	f
-SubStack	lol.c	/^Node * SubStack(Node * stack)$/;"	f
 SubStack	stack.c	/^Node * SubStack(Node * stack)$/;"	f
-TG	lex.h	/^enum {SIN, COS, TG, LN};	\/\/OPERATOR$/;"	e	enum:__anon3
-Token	lex.h	/^} Token;$/;"	t	typeref:struct:__anon7
+Token	lex.h	/^} Token;$/;"	t	typeref:struct:__anon6
 TokenToDot	lex.c	/^void TokenToDot(Token * token)$/;"	f
-Type	lex.h	/^	int Type;$/;"	m	struct:__anon7
-UserQuery	lol.c	/^void UserQuery(Node * stack)$/;"	f
-Value	lex.h	/^	int Value;$/;"	m	struct:__anon7
-Value	lol.c	/^	Data Value;$/;"	m	struct:Node	file:
+Type	lex.h	/^	int Type;$/;"	m	struct:__anon6
+Value	lex.h	/^	int Value;$/;"	m	struct:__anon6
 Value	stack.h	/^	Data Value;$/;"	m	struct:Node
-WordSize	lol.c	6;"	d	file:
 WordSize	stack.c	1;"	d	file:
 dot_semantics	lex.c	/^char * dot_semantics;$/;"	v
 dot_token_counter	lex.c	/^int dot_token_counter;$/;"	v
-file_dot	lol.c	/^FILE * file_dot;$/;"	v
 file_dot_stack	stack.c	/^FILE * file_dot_stack;$/;"	v
 file_dot_token	lex.c	/^FILE * file_dot_token;$/;"	v
 main	comp.c	/^int main()$/;"	f
-main	lol.c	/^int main()$/;"	f
-rax	comp.c	/^int rax, rbx, rcx, rdx;$/;"	v
-rbx	comp.c	/^int rax, rbx, rcx, rdx;$/;"	v
-rcx	comp.c	/^int rax, rbx, rcx, rdx;$/;"	v
-rdx	comp.c	/^int rax, rbx, rcx, rdx;$/;"	v
-sp	comp.c	/^Node * sp;$/;"	v
+rax	run.c	/^int rax, rbx, rcx, rdx;$/;"	v
+rbx	run.c	/^int rax, rbx, rcx, rdx;$/;"	v
+rcx	run.c	/^int rax, rbx, rcx, rdx;$/;"	v
+rdx	run.c	/^int rax, rbx, rcx, rdx;$/;"	v
+sp	run.c	/^Node * sp = NULL;$/;"	v

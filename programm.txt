@@ -1,18 +1,14 @@
+push 43
+push 64
+
+add
 in rax
-in rbx
-in rcx
-in rdx
-
 push rax
-push rbx
-push rcx
-push rdx
-
-push 53
+sub
+push 2
+mul
 push 3
-push -3
-push 35
+div
+pop rax
 
-out rcx
-out rcx
-rax = 
+out rax

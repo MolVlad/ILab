@@ -1,5 +1,6 @@
-Node * sp;
-int rax, rbx, rcx, rdx;
 
 void Run(Token * tokens);
+int GetG(Token * tokens);
+int IsEquality(Token * token);
+int IsEnd(Token * tokens);
 

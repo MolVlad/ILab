@@ -1,6 +1,5 @@
-int GetG(Token * tokens);
-int IsEquality(Token * token);
-int IsEnd(Token * tokens);
+Node * sp = NULL;
+int rax, rbx, rcx, rdx;
 
 int IsEquality(Token * token)
 {
@@ -71,25 +70,21 @@ void Run(Token * tokens)
 								printf("scan rax:\n");
 								scanf("%d", &num);
 								rax = num;
-								printf("rax = %d\n", rax);
 								break;
 							case RBX:
 								printf("scan rbx:\n");
 								scanf("%d", &num);
 								rbx = num;
-								printf("rbx = %d\n", rbx);
 								break;
 							case RCX:
 								printf("scan rcx:\n");
 								scanf("%d", &num);
 								rcx = num;
-								printf("rcx = %d\n", rcx);
 								break;
 							case RDX:
 								printf("scan rdx:\n");
 								scanf("%d", &num);
 								rdx = num;
-								printf("rdx = %d\n", rdx);
 								break;
 							default:
 								assert(!"error");
@@ -128,19 +123,19 @@ void Run(Token * tokens)
 							{
 								case RAX:
 									printf("rax (%d) to stack\n", rax);
-									PushStack(sp, rax);
+									sp = PushStack(sp, rax);
 									break;
 								case RBX:
 									printf("rbx (%d) to stack\n", rbx);
-									PushStack(sp, rbx);
+									sp = PushStack(sp, rbx);
 									break;
 								case RCX:
 									printf("rcx (%d) to stack\n", rcx);
-									PushStack(sp, rcx);
+									sp = PushStack(sp, rcx);
 									break;
 								case RDX:
 									printf("rdx (%d) to stack\n", rdx);
-									PushStack(sp, rdx);
+									sp = PushStack(sp, rdx);
 									break;
 								default:
 									assert(!"error");
@@ -148,12 +143,57 @@ void Run(Token * tokens)
 						else if(object->Type == NUMBER)
 						{
 							printf("%d to stack\n", object->Value);
-							PushStack(sp, object->Value);
+							sp = PushStack(sp, object->Value);
 						}
 						else
 							assert(!"error");
 
 						assert(IsNewStr(PopToken(&tokens)));
+						break;
+					case POP:
+						object = PopToken(&tokens);
+						assert(object->Type == REGISTER);
+						assert(!IsEmptyStack(sp));
+
+						switch(object->Value)
+							{
+								case RAX:
+									rax = PopStack(&sp);
+									printf("top of stack (%d) to rax\n", rax);
+									break;
+								case RBX:
+									rbx = PopStack(&sp);
+									printf("top of stack (%d) to rbx\n", rbx);
+									break;
+								case RCX:
+									rcx = PopStack(&sp);
+									printf("top of stack (%d) to rcx\n", rcx);
+									break;
+								case RDX:
+									rdx = PopStack(&sp);
+									printf("top of stack (%d) to rdx\n", rdx);
+									break;
+								default:
+									assert(!"error");
+							}
+
+						assert(IsNewStr(PopToken(&tokens)));
+						break;
+					case ADD:
+						sp = AddStack(sp);
+
+						break;
+					case SUB:
+						sp = SubStack(sp);
+
+						break;
+					case MUL:
+						sp = MulStack(sp);
+
+						break;
+					case DIV:
+						sp = DivStack(sp);
+
 						break;
 					default:
 						assert(!"error");
@@ -167,5 +207,12 @@ void Run(Token * tokens)
 
 int GetG(Token * tokens)
 {
-	return 1;
+	int ret = GetE(tokens);
+	assert(IsNewStr(tokens));
+	return ret;
+}
+
+int GetT(Token * tokens)
+{
+	
 }

@@ -1,21 +1,18 @@
 in rax
 in rbx
-rcx = sin(rax)
-rdx = cos(rbx)
-rcx = rcx + rax
-rdx = rdx - rbx
+in rcx
+in rdx
+
+push rax
+push rbx
 push rcx
 push rdx
-add
-push rax
-mul
-push rbx
-div
-push rax
-sub
-pop rcx
+
+push 53
+push 3
+push -3
+push 35
+
 out rcx
-rax = tg(rdx - rax)
-rdx = ln(rbx)
-rcx = rdx ^ rbx
 out rcx
+rax = 

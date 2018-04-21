@@ -15,3 +15,4 @@ typedef struct
 
 char * FileToStr();
 Token * LexicalAnalysis(char * str);
+Token * PopToken(Token ** tokens);

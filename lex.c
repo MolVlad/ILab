@@ -1,3 +1,6 @@
+#define Plus 1
+#define Minus 0
+
 FILE * file_dot_token;
 int dot_token_counter;
 char * dot_semantics;
@@ -55,8 +58,29 @@ Token * LexicalAnalysis(char * str)
 
 	while(position < size)
 	{
-		//---|BIN_OPERATORS|---
-		if(str[position] == '+')
+		if('0' <= str[position] && str[position] <= '9')
+		{
+			int num = 0;
+			while('0' <= str[position] && str[position] <= '9')
+			{
+				num = num * 10 + str[position] - '0';
+				position++;
+			}
+			tokens = CreateToken(tokens, NUMBER, num);
+		}
+		else if((str[position] == '-') && ('0' <= str[position + 1]) && (str[position + 1] <= '9'))
+		{
+			position++;
+			int num = 0;
+			while('0' <= str[position] && str[position] <= '9')
+			{
+				num = num * 10 + str[position] - '0';
+				position++;
+			}
+			tokens = CreateToken(tokens, NUMBER, num * (-1));
+		}
+	//---|BIN_OPERATORS|---
+		else if(str[position] == '+')
 		{
 			tokens = CreateToken(tokens, BIN_OPERATOR, PLUS);
 			position++;
@@ -234,10 +258,20 @@ void TokenToDot(Token * token)
 {
 	assert(token);
 
-	dot_semantics = GetSemantics(token);
-	fprintf(file_dot_token, "\tN%d [label=\"", dot_token_counter);
-	fprintf(file_dot_token, "%s", dot_semantics);
-	fprintf(file_dot_token, "\"]\n");
+	if(token->Type == NUMBER)
+	{
+		fprintf(file_dot_token, "\tN%d [label=\"", dot_token_counter);
+		fprintf(file_dot_token, "%d", token->Value);
+		fprintf(file_dot_token, "\"]\n");
+	}
+	else
+	{
+		dot_semantics = GetSemantics(token);
+		fprintf(file_dot_token, "\tN%d [label=\"", dot_token_counter);
+		fprintf(file_dot_token, "%s", dot_semantics);
+		fprintf(file_dot_token, "\"]\n");
+	}
+
 	if (token->Next)
 	{
 		fprintf(file_dot_token, "\tN%d->N%d\n", dot_token_counter, dot_token_counter+1);
@@ -348,3 +382,16 @@ Token * CreateToken(Token * tokens, int type, int value)
 
 		return tokens;
 }
+
+Token * PopToken(Token ** tokens)
+{
+	if(!(*tokens))
+		return NULL;
+	else
+	{
+		Token * cur = *tokens;
+		*tokens = cur->Next;
+		return cur;
+	}
+}
+

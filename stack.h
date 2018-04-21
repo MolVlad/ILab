@@ -1,9 +1,9 @@
 typedef int Data;
 typedef struct Node
 {
-		int Number;
-			struct Node * Next;
-				Data Value;
+	int Number;
+	struct Node * Next;
+	Data Value;
 
 } Node;
 

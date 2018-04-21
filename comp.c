@@ -11,18 +11,14 @@
 
 char * FileToStr();
 
-Node * sp;
-int rax, rbx, rcx, rdx;
-
 int main()
 {
 	sp = CreateStack();
 	rax = rbx = rcx = rdx = 0;
 
 	char * str = FileToStr();
-	printf("ASDGHJHJEGIOERG\n\n\n\n");
 	Token * tokens = LexicalAnalysis(str);
-//	Run(tokens);
+	Run(tokens);
 
 	return 0;
 }

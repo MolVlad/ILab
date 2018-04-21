@@ -17,14 +17,16 @@ Node * PushStack(Node * stack, Data value)
 		stack->Next = NULL;
 		stack->Value = value;
 		stack->Number = 1;
+		return stack;
 	}
 	else
 	{
-		stack->Next = PushStack(stack->Next, value);
-		stack->Number++;
+		Node * new = calloc(1, sizeof(Node));
+		new->Value = value;
+		new->Next = stack;
+		new->Number = stack->Number + 1;
+		return new;
 	}
-
-	return stack;
 }
 
 void PrintStack(Node * stack)

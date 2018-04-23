@@ -4,6 +4,7 @@
 #include <string.h>
 
 //---|для стека|---
+
 #define WordSize 30
 
 typedef int Data;
@@ -18,14 +19,12 @@ typedef struct Node
 Node * CreateStack();
 Node * PushStack(Node * stack, Data value);
 Data PopStack(Node ** stack);
-void PrintStack(Node * stack);
-int SizeStack(Node * stack);
-int IsEmptyStack(Node * stack);
 void DeleteStack(Node * stack);
 Node * MulStack(Node * stack);
 Node * AddStack(Node * stack);
 Node * SubStack(Node * stack);
 Node * DivStack(Node * stack);
+int SizeStack(Node * stack);
 
 //---|для лексического анализа|---
 
@@ -34,9 +33,9 @@ Node * DivStack(Node * stack);
 
 enum {BIN_OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, END};
 
-enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};	// BIN_OPERATOR
-enum {RAX, RBX, RCX, RDX};	// REGISTER
-enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};	// FUNCTION
+enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};			// BIN_OPERATOR
+enum {RAX, RBX, RCX, RDX};					// REGISTER
+enum {IN, OUT, PUSH, POP, ADD, SUB, MUL, DIV};			// FUNCTION
 enum {BRACKET_OPENING, BRACKET_CLOSE, NEW_LINE, EQUALITY};	//PUNCTUATION
 
 typedef struct
@@ -61,7 +60,8 @@ char * GetSemantics(Token * token, int pos);
 Token * CreateToken(Token * tokens, int type, int value);
 
 //---|для проверки корректности|---
-int pos_check;
+
+int position;
 
 void Check(Token * tokens);
 void ErrorMessage(Token * tokens);
@@ -69,15 +69,19 @@ void Check_G(Token * tokens);
 void Check_E(Token * tokens);
 void Check_T(Token * tokens);
 void Check_P(Token * tokens);
+void Check_N(Token * tokens);
 
 //---|для запуска программы|---
 
+Node * stack_pointer;
+int rax, rbx, rcx, rdx;
+
 void Run(Token * tokens);
-int GetG(Token * tokens);
-int GetE(Token * tokens);
-int GetT(Token * tokens);
-int GetP(Token * tokens);
-int GetN(Token * tokens);
+int Get_G(Token * tokens);
+int Get_E(Token * tokens);
+int Get_T(Token * tokens);
+int Get_P(Token * tokens);
+int Get_N(Token * tokens);
 
 int main()
 {
@@ -130,9 +134,9 @@ void PrintStack(Node * stack)
 
 Node * MulStack(Node * stack)
 {
-	if(IsEmptyStack(stack))
+	if(SizeStack(stack) < 2)
 	{
-		printf("Empty\n");
+		assert(!"Not enough in stack");
 	}
 	else
 	{
@@ -147,9 +151,9 @@ Node * MulStack(Node * stack)
 
 Node * AddStack(Node * stack)
 {
-	if(IsEmptyStack(stack))
+	if(SizeStack(stack) < 2)
 	{
-		printf("Empty\n");
+		assert(!"Not enough in stack");
 	}
 	else
 	{
@@ -165,9 +169,9 @@ Node * AddStack(Node * stack)
 
 Node * SubStack(Node * stack)
 {
-	if(IsEmptyStack(stack))
+	if(SizeStack(stack) < 2)
 	{
-		printf("Empty\n");
+		assert(!"Not enough in stack");
 	}
 	else
 	{
@@ -182,9 +186,9 @@ Node * SubStack(Node * stack)
 
 Node * DivStack(Node * stack)
 {
-	if(IsEmptyStack(stack))
+	if(SizeStack(stack) < 2)
 	{
-		printf("Empty\n");
+		assert(!"Not enough in stack");
 	}
 	else
 	{
@@ -203,6 +207,9 @@ Data PopStack(Node ** stack)
 {
 	assert(&stack);
 
+	if(!*stack)
+		assert(!"Empty stack!");
+
 	Node * cur = *stack;
 	Data value = cur->Value;
 	*stack = cur->Next;
@@ -212,22 +219,12 @@ Data PopStack(Node ** stack)
 	return value;
 }
 
-Data CopyTopStack(Node * stack)
-{
-	return stack->Value;
-}
-
 int SizeStack(Node * stack)
 {
 	if(!stack)
 		return 0;
 	else
 		return stack->Number;
-}
-
-int IsEmptyStack(Node * stack)
-{
-	return stack == NULL;
 }
 
 void DeleteStack(Node * stack)
@@ -251,7 +248,7 @@ char * FileToStr()
 	int n = SizeOfFile(file);
 	assert(n);
 	printf("Размер файла - %d символов\n", n);
-	char * str = (char *) calloc(n, sizeof(char));
+	char * str = (char *) calloc(n+1, sizeof(char));
 	assert(str);
 	fscanf(file, "%[^EOF]", str);
 	assert(str);
@@ -284,6 +281,7 @@ Token * LexicalAnalysis(char * str)
 
 	int position = 0;
 	int size = strlen(str);
+	int num;
 	assert(size);
 
 	Token * tokens = NULL;
@@ -297,27 +295,12 @@ Token * LexicalAnalysis(char * str)
 	//---|NUMBERS|---
 		if('0' <= str[position] && str[position] <= '9')
 		{
-			int num = 0;
+			num = 0;
 			while('0' <= str[position] && str[position] <= '9')
 			{
 				num = num * 10 + str[position] - '0';
 				position++;
 			}
-
-			tokens = CreateToken(tokens, NUMBER, num);
-			num_word++;
-		}
-		else if((str[position] == '-') && ('0' <= str[position + 1]) && (str[position + 1] <= '9'))
-		{
-			position++;
-			int num = 0;
-			while('0' <= str[position] && str[position] <= '9')
-			{
-				num = num * 10 + str[position] - '0';
-				position++;
-			}
-
-			num *= -1;
 
 			tokens = CreateToken(tokens, NUMBER, num);
 			num_word++;
@@ -478,6 +461,8 @@ Token * LexicalAnalysis(char * str)
 
 	tokens = CreateToken(tokens, END, 0);
 
+	free(str);
+
 	printf("---|Лексический анализ завершен|---\n");
 	printf("---|Вывод в Dot|---\n\n");
 	DotToken(tokens);
@@ -632,27 +617,27 @@ Token * CreateToken(Token * tokens, int type, int value)
 
 void ErrorMessage(Token * tokens)
 {
-	printf("Error: %d string, %d word\n", tokens[pos_check].Num_Str, tokens[pos_check].Num_Word);
+	printf("Error: %d string, %d word\n", tokens[position].Num_Str, tokens[position].Num_Word);
 	assert(!"Error");
 }
 
 int IsNewLine(Token * tokens)
 {
-	return tokens[pos_check].Type == PUNCTUATION && tokens[pos_check].Value == NEW_LINE;
+	return tokens[position].Type == PUNCTUATION && tokens[position].Value == NEW_LINE;
 }
 
 void Check(Token * tokens)
 {
 	printf("\n---|Проверка корректности программы|---\n");
 
-	pos_check = 0;
+	position = 0;
 
-	while(tokens[pos_check].Type != END)
+	while(tokens[position].Type != END)
 	{
-		switch(tokens[pos_check].Type)
+		switch(tokens[position].Type)
 		{
 			case PUNCTUATION:
-				switch (tokens[pos_check].Value)
+				switch (tokens[position].Value)
 				{
 					case NEW_LINE:
 						break;
@@ -661,45 +646,52 @@ void Check(Token * tokens)
 				}
 				break;
 			case REGISTER:
-				pos_check++;
-				if(tokens[pos_check].Type != PUNCTUATION || tokens[pos_check].Value != EQUALITY)
+				position++;
+				if(tokens[position].Type != PUNCTUATION || tokens[position].Value != EQUALITY)
 					ErrorMessage(tokens);
-				pos_check++;
+				position++;
 				Check_G(tokens);
 				break;
 			case FUNCTION:
-				switch (tokens[pos_check].Value)
+				switch (tokens[position].Value)
 				{
 					case IN:
-						pos_check++;
-						if(tokens[pos_check].Type != REGISTER)
+						position++;
+						if(tokens[position].Type != REGISTER)
 							ErrorMessage(tokens);
 						break;
 					case OUT:
-						pos_check++;
-						if(tokens[pos_check].Type != REGISTER)
+						position++;
+						if(tokens[position].Type != REGISTER)
 							ErrorMessage(tokens);
 						break;
 					case PUSH:
-						pos_check++;
-						if(tokens[pos_check].Type != REGISTER && tokens[pos_check].Type != NUMBER)
+						position++;
+						if(tokens[position].Type == BIN_OPERATOR && tokens[position].Value == MINUS)
+						{
+							position++;
+							if(!tokens[position].Type == NUMBER)
+							ErrorMessage(tokens);
+							position++;
+						}
+						else if(tokens[position].Type != REGISTER && tokens[position].Type != NUMBER)
 							ErrorMessage(tokens);
 						break;
 					case POP:
-						pos_check++;
-						if(tokens[pos_check].Type != REGISTER)
+						position++;
+						if(tokens[position].Type != REGISTER)
 							ErrorMessage(tokens);
 						break;
 					default:
 						break;
 				}
-				pos_check++;
+				position++;
 			break;
 		}
 
 		if(!IsNewLine(tokens))
 			ErrorMessage(tokens);
-		pos_check++;
+		position++;
 	}
 
 	printf("---|Программа написана корректно|---\n");
@@ -707,12 +699,12 @@ void Check(Token * tokens)
 
 int IsPlusMinus(Token * tokens)
 {
-	return tokens[pos_check].Type == BIN_OPERATOR && (tokens[pos_check].Value == PLUS || tokens[pos_check].Value == MINUS);
+	return tokens[position].Type == BIN_OPERATOR && (tokens[position].Value == PLUS || tokens[position].Value == MINUS);
 }
 
 int IsMulDivDegr(Token * tokens)
 {
-	return tokens[pos_check].Type == BIN_OPERATOR && (tokens[pos_check].Value == MULTIPLY || tokens[pos_check].Value == DIVIDE || tokens[pos_check].Value == DEGREE);
+	return tokens[position].Type == BIN_OPERATOR && (tokens[position].Value == MULTIPLY || tokens[position].Value == DIVIDE || tokens[position].Value == DEGREE);
 }
 
 void Check_G(Token * tokens)
@@ -728,7 +720,7 @@ void Check_E(Token * tokens)
 
 	while(IsPlusMinus(tokens))
 	{
-		pos_check++;
+		position++;
 		Check_T(tokens);
 	}
 }
@@ -739,25 +731,47 @@ void Check_T(Token * tokens)
 
 	while(IsMulDivDegr(tokens))
 	{
-		pos_check++;
-		Check_P(tokens);
+		if(tokens[position].Value == DEGREE)
+		{
+			position++;
+
+			Check_N(tokens);
+		}
+		else
+		{
+			position++;
+			Check_P(tokens);
+		}
 	}
 }
 
 void Check_P(Token * tokens)
 {
-	if(tokens[pos_check].Type == PUNCTUATION && tokens[pos_check].Value == BRACKET_OPENING)
+	if(tokens[position].Type == PUNCTUATION && tokens[position].Value == BRACKET_OPENING)
 	{
-		pos_check++;
+		position++;
 		Check_E(tokens);
-		if(!(tokens[pos_check].Type == PUNCTUATION && tokens[pos_check].Value == BRACKET_CLOSE))
+		if(!(tokens[position].Type == PUNCTUATION && tokens[position].Value == BRACKET_CLOSE))
 			ErrorMessage(tokens);
-		pos_check++;
+		position++;
 	}
-	else if(tokens[pos_check].Type == REGISTER)
-		pos_check++;
-	else if(tokens[pos_check].Type == NUMBER)
-		pos_check++;
+	else if(tokens[position].Type == REGISTER)
+		position++;
+	else
+		Check_N(tokens);
+}
+
+void Check_N(Token * tokens)
+{
+	if(tokens[position].Type == NUMBER)
+		position++;
+	else if(tokens[position].Type == BIN_OPERATOR && tokens[position].Value == MINUS)
+	{
+		position++;
+		if(tokens[position].Type != NUMBER)
+			ErrorMessage(tokens);
+		position++;
+	}
 	else
 		ErrorMessage(tokens);
 }
@@ -766,140 +780,303 @@ void Check_P(Token * tokens)
 
 void Run(Token * tokens)
 {
+	stack_pointer = CreateStack();
+	rax = rbx = rcx = rdx = 0;
+
 	printf("\n---|Выполнение программы|---\n");
 
-	pos_check = 0;
+	position = 0;
 
-	while(tokens[pos_check].Type != END)
-	{
-		switch(tokens[pos_check].Type)
+	while(tokens[position].Type != END)
+		switch(tokens[position].Type)
 		{
 			case PUNCTUATION:
-				switch (tokens[pos_check].Value)
-				{
-					case NEW_LINE:
-						break;
-					default:
-						ErrorMessage(tokens);
-				}
+				if(tokens[position].Value == NEW_LINE)
+					position++;
 				break;
 			case REGISTER:
-				pos_check++;
-				if(tokens[pos_check].Type != PUNCTUATION || tokens[pos_check].Value != EQUALITY)
-					ErrorMessage(tokens);
-				pos_check++;
-				GetG(tokens);
-				pos_check++;
-				if(!IsNewLine(tokens))
-					ErrorMessage(tokens);
-				break;
-			case FUNCTION:
-				switch (tokens[pos_check].Value)
+				switch (tokens[position].Value)
 				{
-					case IN:
-						pos_check++;
-						if(tokens[pos_check].Type != REGISTER)
-							ErrorMessage(tokens);
+					case RAX:
+						position += 2;
+						printf("rax = ");
+						rax = Get_G(tokens);
+						printf(" = %d\n", rax);
 						break;
-					case OUT:
-						pos_check++;
-						if(tokens[pos_check].Type != REGISTER)
-							ErrorMessage(tokens);
+					case RBX:
+						position += 2;
+						printf("rbx = ");
+						rbx = Get_G(tokens);
+						printf(" = %d\n", rbx);
 						break;
-					case PUSH:
-						pos_check++;
-						if(tokens[pos_check].Type != REGISTER && tokens[pos_check].Type != NUMBER)
-							ErrorMessage(tokens);
+					case RCX:
+						position += 2;
+						printf("rcx = ");
+						rcx = Get_G(tokens);
+						printf(" = %d\n", rcx);
 						break;
-					case POP:
-						pos_check++;
-						if(tokens[pos_check].Type != REGISTER)
-							ErrorMessage(tokens);
-						break;
-					default:
+					case RDX:
+						position += 2;
+						printf("rdx = ");
+						rdx = Get_G(tokens);
+						printf(" = %d\n", rdx);
 						break;
 				}
-				pos_check++;
+
+				break;
+			case FUNCTION:
+				switch (tokens[position].Value)
+				{
+					case IN:
+						position++;
+
+						switch (tokens[position].Value)
+						{
+							case RAX:
+								printf("Enter rax:\n");
+								scanf("%d", &rax);
+								break;
+							case RBX:
+								printf("Enter rbx:\n");
+								scanf("%d", &rbx);
+								break;
+							case RCX:
+								printf("Enter rcx:\n");
+								scanf("%d", &rcx);
+								break;
+							case RDX:
+								printf("Enter rdx:\n");
+								scanf("%d", &rdx);
+								break;
+						}
+
+						position++;
+						break;
+					case OUT:
+						position++;
+
+						switch (tokens[position].Value)
+						{
+							case RAX:
+								printf("Value rax:\n");
+								printf("%d\n", rax);
+								break;
+							case RBX:
+								printf("Value rbx:\n");
+								printf("%d\n", rbx);
+								break;
+							case RCX:
+								printf("Value rcx:\n");
+								printf("%d\n", rcx);
+								break;
+							case RDX:
+								printf("Value rdx:\n");
+								printf("%d\n", rdx);
+								break;
+						}
+
+						position++;
+						break;
+					case PUSH:
+						position++;
+
+						if(tokens[position].Type == NUMBER)
+						{
+							int num = tokens[position].Value;
+							stack_pointer = PushStack(stack_pointer, num);
+							printf("%d to stack\n", num);
+						}
+						else
+							switch (tokens[position].Value)
+							{
+								case RAX:
+									stack_pointer = PushStack(stack_pointer, rax);
+									printf("rax (%d) to stack\n", rax);
+									break;
+								case RBX:
+									stack_pointer = PushStack(stack_pointer, rbx);
+									printf("rbx (%d) to stack\n", rbx);
+									break;
+								case RCX:
+									stack_pointer = PushStack(stack_pointer, rcx);
+									printf("rcx (%d) to stack\n", rcx);
+									break;
+								case RDX:
+									stack_pointer = PushStack(stack_pointer, rdx);
+									printf("rdx (%d) to stack\n", rdx);
+									break;
+							}
+
+						position++;
+						break;
+					case POP:
+						position++;
+
+						switch (tokens[position].Value)
+						{
+							case RAX:
+								rax = PopStack(&stack_pointer);
+								printf("Top of stack (%d) to rax\n", rax);
+								break;
+							case RBX:
+								rbx = PopStack(&stack_pointer);
+								printf("Top of stack (%d) to rbx\n", rbx);
+								break;
+							case RCX:
+								rcx = PopStack(&stack_pointer);
+								printf("Top of stack (%d) to rcx\n", rcx);
+								break;
+							case RDX:
+								rdx = PopStack(&stack_pointer);
+								printf("Top of stack (%d) to rdx\n", rdx);
+								break;
+						}
+
+						position++;
+						break;
+					case ADD:
+						stack_pointer = AddStack(stack_pointer);
+						break;
+					case SUB:
+						stack_pointer = SubStack(stack_pointer);
+						break;
+					case DIV:
+						stack_pointer = DivStack(stack_pointer);
+						break;
+					case MUL:
+						stack_pointer = MulStack(stack_pointer);
+						break;
+				}
+
+			position++;
 			break;
 		}
 
-		if(!IsNewLine(tokens))
-			ErrorMessage(tokens);
-		pos_check++;
-	}
-
+	DeleteStack(stack_pointer);
+	free(tokens);
 	printf("---|Выполнение программы завершено успешно|---\n");
 }
 
-int GetG(Token * tokens)
+int Get_G(Token * tokens)
 {
-//	int ret = GetE(tokens);
-	return 1;
+	int ret = Get_E(tokens);
+
+	return ret;
 }
 
-int GetE(Token * tokens)
+int Get_E(Token * tokens)
 {
-	int ret = GetT(tokens);
+	int ret = Get_T(tokens);
 
 	while(IsPlusMinus(tokens))
 	{
-		Token * operator = PopToken(&tokens);
-		if(operator->Value == PLUS)
-			ret = ret + GetT(tokens);
+		if(tokens[position].Value == PLUS)
+		{
+			position++;
+			printf("+");
+			ret = ret + Get_T(tokens);
+		}
 		else
-			ret = ret - GetT(tokens);
+		{
+			position++;
+			printf("-");
+			ret = ret - Get_T(tokens);
+		}
 	}
 
 	return ret;
 }
 
-int GetT(Token * tokens)
+int Get_T(Token * tokens)
 {
-	int ret = GetP(tokens);
+	int ret = Get_P(tokens);
 
 	while(IsMulDivDegr(tokens))
 	{
-		Token * operator = PopToken(&tokens);
-		if(operator->Value == MULTIPLY)
-			ret = ret * GetP(tokens);
-		else if(operator->Value == DIVIDE)
-			ret = ret / GetP(tokens);
+		int operator = tokens[position].Value;
+		position++;
+
+		if(operator == MULTIPLY)
+		{
+			printf("*");
+			ret = ret * Get_P(tokens);
+		}
+		else if(operator == DIVIDE)
+		{
+			printf("/");
+			ret = ret / Get_P(tokens);
+		}
 		else
-			ret = ret / GetN(tokens);
+		{
+			printf("^");
+			ret = ret ^ Get_P(tokens);
+		}
 	}
 
 	return ret;
-
 }
 
-int GetP(Token * tokens)
+int Get_P(Token * tokens)
 {
 	int ret;
 
-	e•RAX:¬
-	104 >·······>·······>·······>·······>·······>·······>·······>·······printf("scan•rax:\n");¬
+	if(tokens[position].Type == PUNCTUATION && tokens[position].Value == BRACKET_OPENING)
+	{
+		printf("(");
+		position++;
+		ret = Get_E(tokens);
+		printf(")");
+		position++;
+	}
+	else if(tokens[position].Type == REGISTER)
+	{
+		switch (tokens[position].Value)
+		{
+			case RAX:
+				printf("rax(= %d)", rax);
+				ret = rax;
+				break;
+			case RBX:
+				printf("rbx(= %d)", rbx);
+				ret = rbx;
+				break;
+			case RCX:
+				printf("rcx(= %d)", rcx);
+				ret = rcx;
+				break;
+			case RDX:
+				printf("rdx(= %d)", rdx);
+				ret = rdx;
+				break;
+		}
 
+		position++;
+	}
+	else
+	{
+		ret = Get_N(tokens);
+	}
 
 	return ret;
 }
 
-int GetN(Token * tokens)
+int Get_N(Token * tokens)
 {
-	tokens = PopToken(tokens);
-	return 0;
-	int number = 0;
-	int count = 0;
+	int ret;
 
-	while (tokens->Type == NUMBER)
+	if(tokens[position].Type == NUMBER)
 	{
-		number = number * 10 + tokens->Value;
-		tokens = PopToken(&tokens);
-		count++;
+		ret = tokens[position].Value;
+		position++;
+		printf("%d", ret);
+	}
+	else
+	{
+		position++;
+		ret = (-1) * tokens[position].Value;
+		position++;
+		printf("%d", ret);
 	}
 
-	assert(count);
-	return number;
+	return ret;
 }
-
-
-

@@ -1,6 +1,7 @@
-
 void Run(Token * tokens);
-int GetG(Token * tokens);
-int IsEquality(Token * token);
-int IsEnd(Token * tokens);
+int Run_GetG(Token * tokens);
+int Run_GetE(Token * tokens);
+int Run_GetT(Token * tokens);
+int Run_GetP(Token * tokens);
+int Run_GetN(Token * tokens);
 

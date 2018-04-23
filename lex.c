@@ -3,13 +3,14 @@
 
 FILE * file_dot_token;
 int dot_token_counter;
-char * dot_semantics;
+int num_str, num_word, size_tokens_cur, size_tokens_max;
+const int initial_quality = 5;
 
 int SizeOfFile(FILE * file);
-Token * CreateToken(Token * tokens, int type, int value);
-void TokenToDot(Token * token);
+void TokensToDot(Token * token);
 void DotToken(Token * tokens);
-char * GetSemantics(Token * token);
+char * GetSemantics(Token * token, int pos);
+Token * CreateToken(Token * tokens, int type, int value);
 
 char * FileToStr()
 {
@@ -54,7 +55,13 @@ Token * LexicalAnalysis(char * str)
 
 	int position = 0;
 	int size = strlen(str);
+	assert(size);
+
 	Token * tokens = NULL;
+	size_tokens_cur = 0;
+	size_tokens_max = 0;
+	num_str = 1;
+	num_word = 1;
 
 	while(position < size)
 	{
@@ -67,7 +74,9 @@ Token * LexicalAnalysis(char * str)
 				num = num * 10 + str[position] - '0';
 				position++;
 			}
+
 			tokens = CreateToken(tokens, NUMBER, num);
+			num_word++;
 		}
 		else if((str[position] == '-') && ('0' <= str[position + 1]) && (str[position + 1] <= '9'))
 		{
@@ -78,32 +87,41 @@ Token * LexicalAnalysis(char * str)
 				num = num * 10 + str[position] - '0';
 				position++;
 			}
-			tokens = CreateToken(tokens, NUMBER, num * (-1));
+
+			num *= -1;
+
+			tokens = CreateToken(tokens, NUMBER, num);
+			num_word++;
 		}
 	//---|BIN_OPERATORS|---
 		else if(str[position] == '+')
 		{
 			tokens = CreateToken(tokens, BIN_OPERATOR, PLUS);
+			num_word++;
 			position++;
 		}
 		else if(str[position] == '-')
 		{
 			tokens = CreateToken(tokens, BIN_OPERATOR, MINUS);
+			num_word++;
 			position++;
 		}
 		else if(str[position] == '*')
 		{
 			tokens = CreateToken(tokens, BIN_OPERATOR, MULTIPLY);
+			num_word++;
 			position++;
 		}
 		else if(str[position] == '/')
 		{
 			tokens = CreateToken(tokens, BIN_OPERATOR, DIVIDE);
+			num_word++;
 			position++;
 		}
 		else if(str[position] == '^')
 		{
 			tokens = CreateToken(tokens, BIN_OPERATOR, DEGREE);
+			num_word++;
 			position++;
 		}
 		//---|REGISTERS|---
@@ -112,24 +130,28 @@ Token * LexicalAnalysis(char * str)
 		{
 			position += 3;
 			tokens = CreateToken(tokens, REGISTER, RAX);
+			num_word++;
 		}
 		else if(str[position] == 'r'&& str[position + 1] == 'b' && str[position + 2] == 'x'
 				&& (str[position + 3] == ' ' || str[position + 3] == '\n' || str[position + 3] == ')'))
 		{
 			position += 3;
 			tokens = CreateToken(tokens, REGISTER, RBX);
+			num_word++;
 		}
 		else if(str[position] == 'r'&& str[position + 1] == 'c' && str[position + 2] == 'x'
 				&& (str[position + 3] == ' ' || str[position + 3] == '\n' || str[position + 3] == ')'))
 		{
 			position += 3;
 			tokens = CreateToken(tokens, REGISTER, RCX);
+			num_word++;
 		}
 		else if(str[position] == 'r'&& str[position + 1] == 'd' && str[position + 2] == 'x'
 				&& (str[position + 3] == ' ' || str[position + 3] == '\n' || str[position + 3] == ')'))
 		{
 			position += 3;
 			tokens = CreateToken(tokens, REGISTER, RDX);
+			num_word++;
 		}
 		//---|PUNCTUATION|---
 		else if(str[position] == '(')
@@ -146,6 +168,8 @@ Token * LexicalAnalysis(char * str)
 		{
 			position++;
 			tokens = CreateToken(tokens, PUNCTUATION, NEW_LINE);
+			num_str++;
+			num_word = 1;
 		}
 		else if(str[position] == '=')
 		{
@@ -162,52 +186,62 @@ Token * LexicalAnalysis(char * str)
 		{
 			position += 2;
 			tokens = CreateToken(tokens, FUNCTION, IN);
+			num_word++;
 		}
 		else if(str[position] == 'o' && str[position + 1] == 'u' && str[position + 2] == 't'
 				&& (str[position + 3] == '\n' || str[position + 3] == ' '))
 		{
 			position += 3;
 			tokens = CreateToken(tokens, FUNCTION, OUT);
+			num_word++;
 		}
 		else if(str[position] == 'p' && str[position + 1] == 'u' && str[position + 2] == 's' && str[position + 3] == 'h'
 				&& (str[position + 4] == '\n' || str[position + 4] == ' '))
 		{
 			position += 4;
 			tokens = CreateToken(tokens, FUNCTION, PUSH);
+			num_word++;
 		}
 		else if(str[position] == 'p' && str[position + 1] == 'o' && str[position + 2] == 'p'
 				&& (str[position + 3] == '\n' || str[position + 3] == ' '))
 		{
 			position += 4;
 			tokens = CreateToken(tokens, FUNCTION, POP);
+			num_word++;
 		}
 		else if(str[position] == 'a' && str[position + 1] == 'd' && str[position + 2] == 'd'
 				&& (str[position + 3] == '\n' || str[position + 3] == ' '))
 		{
 			position += 3;
 			tokens = CreateToken(tokens, FUNCTION, ADD);
+			num_word++;
 		}
 		else if(str[position] == 's' && str[position + 1] == 'u' && str[position + 2] == 'b'
 				&& (str[position + 3] == '\n' || str[position + 3] == ' '))
 		{
 			position += 3;
 			tokens = CreateToken(tokens, FUNCTION, SUB);
+			num_word++;
 		}
 		else if(str[position] == 'm' && str[position + 1] == 'u' && str[position + 2] == 'l'
 				&& (str[position + 3] == '\n' || str[position + 3] == ' '))
 		{
 			position += 3;
 			tokens = CreateToken(tokens, FUNCTION, MUL);
+			num_word++;
 		}
 		else if(str[position] == 'd' && str[position + 1] == 'i' && str[position + 2] == 'v'
 				&& (str[position + 3] == '\n' || str[position + 3] == ' '))
 		{
 			position += 3;
 			tokens = CreateToken(tokens, FUNCTION, DIV);
+			num_word++;
 		}
 		else
 			assert(!"wtf");
 	}
+
+	tokens = CreateToken(tokens, END, 0);
 
 	printf("---|Лексический анализ завершен|---\n");
 	printf("---|Вывод в Dot|---\n\n");
@@ -226,7 +260,7 @@ void DotToken(Token * tokens)
 	assert(file_dot_token);
 	fprintf(file_dot_token, "digraph G {\n");
 	dot_token_counter = 0;
-	TokenToDot(tokens);
+	TokensToDot(tokens);
 	fprintf(file_dot_token, "}");
 	fclose(file_dot_token);
 
@@ -234,38 +268,44 @@ void DotToken(Token * tokens)
 	system("rm tokens.dot");
 }
 
-void TokenToDot(Token * token)
+void TokensToDot(Token * tokens)
 {
-	assert(token);
+	assert(tokens);
 
-	if(token->Type == NUMBER)
-	{
-		fprintf(file_dot_token, "\tN%d [label=\"", dot_token_counter);
-		fprintf(file_dot_token, "%d", token->Value);
-		fprintf(file_dot_token, "\"]\n");
-	}
-	else
-	{
-		dot_semantics = GetSemantics(token);
-		fprintf(file_dot_token, "\tN%d [label=\"", dot_token_counter);
-		fprintf(file_dot_token, "%s", dot_semantics);
-		fprintf(file_dot_token, "\"]\n");
-	}
+	int pos = 0;
 
-	if (token->Next)
+	while(pos < size_tokens_cur)
 	{
-		fprintf(file_dot_token, "\tN%d->N%d\n", dot_token_counter, dot_token_counter+1);
-		dot_token_counter++;
-		TokenToDot(token->Next);
+		if((tokens[pos]).Type == NUMBER)
+		{
+			fprintf(file_dot_token, "\tN%d [label=\"", dot_token_counter);
+			fprintf(file_dot_token, "%d", tokens[pos].Value);
+			fprintf(file_dot_token, "\"]\n");
+		}
+		else
+		{
+			char * dot_semantics = GetSemantics(tokens, pos);
+			fprintf(file_dot_token, "\tN%d [label=\"", dot_token_counter);
+			fprintf(file_dot_token, "%s", dot_semantics);
+			fprintf(file_dot_token, "\"]\n");
+		}
+
+		if (tokens[pos].Type != END)
+		{
+			fprintf(file_dot_token, "\tN%d->N%d\n", dot_token_counter, dot_token_counter+1);
+			dot_token_counter++;
+		}
+
+		pos++;
 	}
 }
 
-char * GetSemantics(Token * token)
+char * GetSemantics(Token * token, int pos)
 {
-	switch(token->Type)
+	switch(token[pos].Type)
 	{
 		case BIN_OPERATOR:
-			switch(token->Value)
+			switch(token[pos].Value)
 			{
 				case PLUS:
 					return "+";
@@ -277,12 +317,9 @@ char * GetSemantics(Token * token)
 					return "*";
 				case DEGREE:
 					return "^";
-				default:
-					assert(!"wtf");
 			}
-			break;
 		case REGISTER:
-			switch(token->Value)
+			switch(token[pos].Value)
 			{
 				case RAX:
 					return "rax";
@@ -293,9 +330,8 @@ char * GetSemantics(Token * token)
 				case RDX:
 					return "rdx";
 			}
-			break;
 		case PUNCTUATION:
-			switch(token->Value)
+			switch(token[pos].Value)
 			{
 				case BRACKET_OPENING:
 					return "(";
@@ -307,7 +343,7 @@ char * GetSemantics(Token * token)
 					return "=";
 			}
 		case FUNCTION:
-			switch(token->Value)
+			switch(token[pos].Value)
 			{
 				case IN:
 					return "in";
@@ -326,37 +362,35 @@ char * GetSemantics(Token * token)
 				case DIV:
 					return "div";
 			}
-		default:
-			assert(!"wtf");
+		case END:
+			return "END";
 	}
 }
 
 Token * CreateToken(Token * tokens, int type, int value)
 {
-	if(!tokens)
+	if(size_tokens_cur == 0)
 	{
-		tokens = calloc(1, sizeof(Token));
-		tokens->Next = NULL;
-		tokens->Type = type;
-		tokens->Value = value;
-
-		return tokens;
+		tokens = calloc(initial_quality, sizeof(Token));
+		size_tokens_max = initial_quality;
 	}
-	else
-		tokens->Next = CreateToken(tokens->Next, type, value);
 
-		return tokens;
+	if(size_tokens_cur == size_tokens_max)
+	{
+		tokens = realloc(tokens, size_tokens_max * 2 * sizeof(Token));
+		size_tokens_max *= 2;
+	}
+
+	int pos = size_tokens_cur;
+
+	tokens[pos].Type = type;
+	tokens[pos].Value = value;
+	tokens[pos].Num_Str = num_str;
+	tokens[pos].Num_Word = num_word;
+
+	size_tokens_cur++;
+
+	return tokens;
 }
 
-Token * PopToken(Token ** tokens)
-{
-	if(!(*tokens))
-		return NULL;
-	else
-	{
-		Token * cur = *tokens;
-		*tokens = cur->Next;
-		return cur;
-	}
-}
 

@@ -1,14 +1,14 @@
-push 43
-push 64
-
-add
+rax = 4
+pop rcx
+rdx = 45
+rbx = -56
+push   rax
 in rax
-push rax
-sub
-push 2
-mul
-push 3
-div
-pop rax
+in rax
+in rax
+in rax
+in rax
+out rbx
 
-out rax
+
+push 3

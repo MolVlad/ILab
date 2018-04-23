@@ -1,4 +1,4 @@
-/*void ErrorMessage(Token * tokens)
+void ErrorMessage(Token * tokens)
 {
 	printf("Error: %d string, %d word\n", tokens[pos_check].Num_Str, tokens[pos_check].Num_Word);
 	assert(!"Error");
@@ -33,7 +33,7 @@ void Check(Token * tokens)
 				if(tokens[pos_check].Type != PUNCTUATION || tokens[pos_check].Value != EQUALITY)
 					ErrorMessage(tokens);
 				pos_check++;
-				GetG(tokens);
+				Check_GetG(tokens);
 				pos_check++;
 				if(!IsNewLine(tokens))
 					ErrorMessage(tokens);
@@ -76,12 +76,12 @@ void Check(Token * tokens)
 	printf("---|Программа написана корректно|---\n");
 }
 
-int GetG(Token * tokens)
+int Check_GetG(Token * tokens)
 {
 //	int ret = GetE(tokens);
 	return 1;
 }
-
+/*
 int GetE(Token * tokens)
 {
 	int ret = GetT(tokens);
@@ -121,9 +121,34 @@ int GetP(Token * tokens)
 {
 	int ret;
 
-	e•RAX:¬
-	104 >·······>·······>·······>·······>·······>·······>·······>·······printf("scan•rax:\n");¬
-
+	if(tokens->Type == PUNCTUATION && tokens->Value == BRACKET_OPENING)
+	{
+		PopToken(tokens);
+		ret = GetE(tokens);
+		Token * next = PopToken(&tokens);
+		assert(next->Type == PUNCTUATION && next->Value == BRACKET_CLOSE);
+	}
+	else if(tokens->Type == REGISTER)
+	{
+		switch (tokens->Value)
+		{
+			case RAX:
+				ret = rax;
+				break;
+			case RBX:
+				ret = rbx;
+				break;
+			case RCX:
+				ret = rcx;
+				break;
+			case RDX:
+				ret = rdx;
+			default:
+				assert(!"error");
+		}
+	}
+	else
+		ret = GetN(tokens);
 
 	return ret;
 }

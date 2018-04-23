@@ -8,17 +8,18 @@
 #include "lex.c"
 #include "run.h"
 #include "run.c"
+#include "check.h"
+#include "check.c"
 
 char * FileToStr();
 
 int main()
 {
-	sp = CreateStack();
-	rax = rbx = rcx = rdx = 0;
 
 	char * str = FileToStr();
 	Token * tokens = LexicalAnalysis(str);
-	Run(tokens);
+	Check(tokens);
+//	Run(tokens);
 
 	return 0;
 }

@@ -1,4 +1,4 @@
-enum {BIN_OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, CONST};
+enum {BIN_OPERATOR, NUMBER, REGISTER, PUNCTUATION, FUNCTION, END};
 
 enum {PLUS, MINUS, DIVIDE, MULTIPLY, DEGREE};	// BIN_OPERATOR
 enum {RAX, RBX, RCX, RDX};	// REGISTER
@@ -9,9 +9,11 @@ typedef struct
 {
 	int Type;
 	int Value;
-	struct Token * Next;
+	int Num_Str;
+	int Num_Word;
 } Token;
 
 char * FileToStr();
 Token * LexicalAnalysis(char * str);
-Token * PopToken(Token ** tokens);
+
+

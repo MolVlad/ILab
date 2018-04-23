@@ -238,7 +238,10 @@ Token * LexicalAnalysis(char * str)
 			num_word++;
 		}
 		else
+		{
+			printf("Error: %d string, %d word\n", num_str, num_word);
 			assert(!"wtf");
+		}
 	}
 
 	tokens = CreateToken(tokens, END, 0);

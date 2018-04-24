@@ -755,8 +755,6 @@ void Check_P(Token * tokens)
 			ErrorMessage(tokens);
 		position++;
 	}
-	else if(tokens[position].Type == REGISTER)
-		position++;
 	else
 		Check_N(tokens);
 }
@@ -765,10 +763,12 @@ void Check_N(Token * tokens)
 {
 	if(tokens[position].Type == NUMBER)
 		position++;
+	else if(tokens[position].Type == REGISTER)
+		position++;
 	else if(tokens[position].Type == BIN_OPERATOR && tokens[position].Value == MINUS)
 	{
 		position++;
-		if(tokens[position].Type != NUMBER)
+		if(tokens[position].Type != NUMBER && tokens[position].Type != REGISTER)
 			ErrorMessage(tokens);
 		position++;
 	}
@@ -1028,6 +1028,24 @@ int Get_P(Token * tokens)
 		printf(")");
 		position++;
 	}
+	else
+	{
+		ret = Get_N(tokens);
+	}
+
+	return ret;
+}
+
+int Get_N(Token * tokens)
+{
+	int ret;
+
+	if(tokens[position].Type == NUMBER)
+	{
+		ret = tokens[position].Value;
+		position++;
+		printf("%d", ret);
+	}
 	else if(tokens[position].Type == REGISTER)
 	{
 		switch (tokens[position].Value)
@@ -1054,28 +1072,9 @@ int Get_P(Token * tokens)
 	}
 	else
 	{
-		ret = Get_N(tokens);
-	}
-
-	return ret;
-}
-
-int Get_N(Token * tokens)
-{
-	int ret;
-
-	if(tokens[position].Type == NUMBER)
-	{
-		ret = tokens[position].Value;
 		position++;
-		printf("%d", ret);
-	}
-	else
-	{
-		position++;
-		ret = (-1) * tokens[position].Value;
-		position++;
-		printf("%d", ret);
+		printf("(-1)*");
+		ret = -Get_P(tokens);
 	}
 
 	return ret;

@@ -1,0 +1,1 @@
+x^(sin(arctg(a*x)+x^3-x^2))/ln(c+exp(a/x))+tg(sin(cos(x^x)))~

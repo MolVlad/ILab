@@ -1,1 +1,0 @@
-human(surname is molodcov(student(vlad)(vladimir))(clever(lesha shoshin)(artur)))(cat)~
